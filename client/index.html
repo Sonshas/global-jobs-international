@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Global Jobs International — find your dream job abroad with trusted international employers worldwide."
+    />
+    <meta
+      name="keywords"
+      content="international jobs, work abroad, overseas careers, Global Jobs International"
+    />
+    <meta name="theme-color" content="#0052CC" />
+    <meta property="og:title" content="Global Jobs International" />
+    <meta
+      property="og:description"
+      content="Find your dream job abroad. Connect with trusted international employers around the world."
+    />
+    <meta property="og:type" content="website" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <title>Global Jobs International | Find Your Dream Job Abroad</title>
+    <script>
+      (function () {
+        try {
+          var stored = localStorage.getItem('gji-theme');
+          var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          var theme = stored === 'light' || stored === 'dark' ? stored : prefersDark ? 'dark' : 'light';
+          document.documentElement.classList.toggle('dark', theme === 'dark');
+          document.documentElement.style.colorScheme = theme;
+        } catch (_) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

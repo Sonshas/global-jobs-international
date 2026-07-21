@@ -1,0 +1,9 @@
+# Supabase config placeholder
+# Link this project with: npx supabase link --project-ref <ref>
+
+
+[api]
+enabled = true
+
+[db]
+major_version = 15
