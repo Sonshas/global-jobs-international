@@ -1,14 +1,32 @@
 import { createContext } from 'react';
 import type { Session, User } from '@supabase/supabase-js';
+import type { RegisterFormValues } from '@/schemas/auth';
+import type { EmployerRegisterFormValues } from '@/schemas/employer-auth';
 
 export type AuthResult = {
   error: string | null;
+};
+
+export type SignUpProfile = Omit<RegisterFormValues, 'password' | 'confirmPassword'> & {
+  phoneE164: string;
+  phoneDialCode: string;
+};
+
+export type EmployerSignUpProfile = Omit<EmployerRegisterFormValues, 'password' | 'confirmPassword'> & {
+  phoneE164: string;
+  phoneDialCode: string;
 };
 
 export type SignUpInput = {
   email: string;
   password: string;
   fullName: string;
+  /** Defaults to 'applicant' when omitted (backward compatible with existing callers). */
+  accountType?: 'applicant' | 'employer';
+  /** Required when accountType is 'applicant' (or omitted). */
+  profile?: SignUpProfile;
+  /** Required when accountType is 'employer'. */
+  employerProfile?: EmployerSignUpProfile;
 };
 
 export type AuthContextValue = {

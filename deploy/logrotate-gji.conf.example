@@ -1,0 +1,17 @@
+# Install as /etc/logrotate.d/global-jobs-international.
+# Replace `deploy` with the Linux user that runs PM2.
+/home/deploy/.pm2/logs/gji-api-*.log /var/log/nginx/global-jobs-international*.log {
+    daily
+    rotate 14
+    missingok
+    notifempty
+    compress
+    delaycompress
+    dateext
+    create 0640 deploy adm
+    sharedscripts
+    postrotate
+        /usr/bin/pm2 reloadLogs >/dev/null 2>&1 || true
+        /usr/sbin/nginx -s reopen >/dev/null 2>&1 || true
+    endscript
+}

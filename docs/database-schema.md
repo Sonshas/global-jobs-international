@@ -16,8 +16,13 @@ supabase/migrations/
 ├── 20260721000008_payments_visa_interviews_reviews.sql
 ├── 20260721000009_activity_settings.sql
 ├── 20260721000010_rls_policies.sql
-└── 20260721000011_seed_reference_data.sql
+├── 20260721000011_seed_reference_data.sql
+├── 20260721000012_application_numbers_catalog_jobs.sql
+├── 20260721000013_rbac_staff_platform_rls.sql
+└── 20260721000014_document_storage.sql
 ```
+
+See also: `docs/document-storage.md` for Storage bucket policies and upload path conventions.
 
 ## Entity overview
 
@@ -31,7 +36,7 @@ supabase/migrations/
 | `countries` / `cities` / `languages` | Geo + i18n references |
 | `job_categories` / `jobs` / `job_requirements` | Job catalog |
 | `applications` / `application_status_history` | Applications lifecycle |
-| `document_types` / `documents` | Uploaded files metadata |
+| `document_types` / `documents` | Uploaded files metadata (+ private Storage bucket `documents`) |
 | `conversations` / `messages` | Applicant ↔ employer messaging |
 | `notifications` | In-app / multi-channel alerts |
 | `payment_methods` / `payments` | Billing |

@@ -1,0 +1,52 @@
+{
+  "generatedAt": "2026-07-21T17:28:06.552Z",
+  "counts": {
+    "PASS": 6,
+    "FAIL": 0,
+    "BLOCKED": 0
+  },
+  "steps": [
+    {
+      "step": 1,
+      "name": "Environment preflight",
+      "status": "PASS",
+      "evidence": "client/.env and server/.env required vars load and match."
+    },
+    {
+      "step": 2,
+      "name": "Deploy artifacts present",
+      "status": "PASS",
+      "evidence": "All 8 deploy/ops artifacts present."
+    },
+    {
+      "step": 3,
+      "name": "Launch checklist and readiness report present",
+      "status": "PASS",
+      "evidence": "Launch checklist and production readiness report on disk."
+    },
+    {
+      "step": 4,
+      "name": "API health reports config flags",
+      "status": "PASS",
+      "evidence": "Health checks: stripe=false, resend=false, supabaseAnon=true, serviceRole=false."
+    },
+    {
+      "step": 5,
+      "name": "Checkout requires auth and Stripe when configured",
+      "status": "PASS",
+      "evidence": "Unauthenticated checkout rejected with 401. STRIPE_SECRET_KEY unset locally (production must set Stripe secrets; checkout then creates sessions)."
+    },
+    {
+      "step": 6,
+      "name": "Pending employer cannot insert published job (RLS)",
+      "status": "PASS",
+      "evidence": "Pending employer job insert blocked: new row violates row-level security policy for table \"jobs\""
+    }
+  ],
+  "remainingExternalBlockers": [
+    "STRIPE_SECRET_KEY + STRIPE_WEBHOOK_SECRET (https://dashboard.stripe.com)",
+    "RESEND_API_KEY for production email",
+    "SUPABASE_SERVICE_ROLE_KEY on staging/production hosts",
+    "Hostinger DNS/TLS/PM2 cutover and backup restore drill"
+  ]
+}

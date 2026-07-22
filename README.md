@@ -4,7 +4,7 @@ Production-ready foundation for a full-stack international jobs platform.
 
 Global Jobs International connects talent with opportunities worldwide. This repository is an npm workspaces monorepo with a React frontend, Express API, shared TypeScript contracts, and Supabase as the data layer.
 
-> **Status:** Project foundation only. Feature pages and domain APIs are not implemented yet.
+> **Status:** Active product UI with Supabase Auth, jobs/applications on Postgres (P0), and Sprint 1 environment/RBAC hardening. See `docs/environments.md` and `docs/rbac.md`.
 
 ## Tech stack
 

@@ -1,22 +1,25 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { AuthLayout } from '@/components/auth/AuthLayout';
 import { AuthCard } from '@/components/auth/AuthCard';
 import { Field, FormAlert, TextInput } from '@/components/auth/FormFields';
 import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/hooks/useAuth';
-import { resetPasswordSchema, type ResetPasswordFormValues } from '@/schemas/auth';
+import { createResetPasswordSchema, type ResetPasswordFormValues } from '@/schemas/auth';
 import { supabase } from '@/lib/supabase';
 
 export function ResetPasswordPage() {
+  const { t, i18n } = useTranslation();
   const { updatePassword, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [ready, setReady] = useState(false);
   const [linkError, setLinkError] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const schema = useMemo(() => createResetPasswordSchema(), [i18n.language]);
 
   useEffect(() => {
     let mounted = true;
@@ -30,9 +33,7 @@ export function ResetPasswordPage() {
         return;
       }
 
-      setLinkError(
-        'This reset link is invalid or has expired. Request a new password reset email.',
-      );
+      setLinkError(t('auth.resetLinkInvalid'));
       setReady(true);
     };
 
@@ -51,14 +52,14 @@ export function ResetPasswordPage() {
       mounted = false;
       subscription.unsubscribe();
     };
-  }, [isAuthenticated]);
+  }, [isAuthenticated, t]);
 
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<ResetPasswordFormValues>({
-    resolver: zodResolver(resetPasswordSchema),
+    resolver: zodResolver(schema),
     defaultValues: { password: '', confirmPassword: '' },
   });
 
@@ -74,24 +75,24 @@ export function ResetPasswordPage() {
   });
 
   return (
-    <AuthLayout title="Set a new password" subtitle="Choose a strong password for your account.">
+    <AuthLayout title={t('auth.resetTitle')} subtitle={t('auth.resetSubtitle')}>
       <AuthCard>
         {!ready ? (
-          <p className="text-sm text-ink-muted dark:text-ink-muted-dark">Validating reset link…</p>
+          <p className="text-sm text-ink-muted dark:text-ink-muted-dark">{t('auth.validatingResetLink')}</p>
         ) : linkError ? (
           <div className="space-y-4">
             <FormAlert>{linkError}</FormAlert>
             <Button href="/forgot-password" className="w-full rounded-2xl">
-              Request a new link
+              {t('auth.requestNewLink')}
             </Button>
           </div>
         ) : success ? (
-          <FormAlert variant="success">Password updated. Redirecting to your dashboard…</FormAlert>
+          <FormAlert variant="success">{t('auth.passwordUpdatedRedirect')}</FormAlert>
         ) : (
           <form onSubmit={onSubmit} className="space-y-4" noValidate>
             {formError ? <FormAlert>{formError}</FormAlert> : null}
 
-            <Field id="password" label="New password" error={errors.password?.message}>
+            <Field id="password" label={t('auth.newPassword')} error={errors.password?.message}>
               <TextInput
                 id="password"
                 type="password"
@@ -103,7 +104,7 @@ export function ResetPasswordPage() {
 
             <Field
               id="confirmPassword"
-              label="Confirm new password"
+              label={t('auth.confirmNewPassword')}
               error={errors.confirmPassword?.message}
             >
               <TextInput
@@ -116,7 +117,7 @@ export function ResetPasswordPage() {
             </Field>
 
             <Button type="submit" className="w-full rounded-2xl" disabled={isSubmitting}>
-              {isSubmitting ? 'Updating…' : 'Update password'}
+              {isSubmitting ? t('auth.updating') : t('auth.updatePassword')}
             </Button>
           </form>
         )}

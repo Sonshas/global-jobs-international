@@ -1,9 +1,11 @@
 import { useId, useState, type FormEvent } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { Container } from '@/components/ui/Container';
 import { Button } from '@/components/ui/Button';
 
 export function Newsletter() {
+  const { t } = useTranslation();
   const inputId = useId();
   const reduceMotion = useReducedMotion();
   const [email, setEmail] = useState('');
@@ -35,12 +37,14 @@ export function Newsletter() {
           transition={{ duration: 0.5 }}
           className="mx-auto max-w-3xl rounded-[2rem] border border-white/15 bg-white/10 p-8 text-center shadow-2xl backdrop-blur-md sm:p-10"
         >
-          <p className="text-sm font-semibold tracking-[0.16em] text-accent uppercase">Newsletter</p>
+          <p className="text-sm font-semibold tracking-[0.16em] text-accent uppercase">
+            {t('home.newsletterTitle')}
+          </p>
           <h2 id="newsletter-heading" className="mt-3 font-heading text-3xl font-bold sm:text-4xl">
-            Stay ahead of global openings
+            {t('home.newsletterTitle')}
           </h2>
           <p className="mt-3 text-base text-blue-100 sm:text-lg">
-            Subscribe for curated international roles, destination guides, and recruitment tips.
+            {t('home.newsletterDescription')}
           </p>
 
           <form
@@ -48,7 +52,7 @@ export function Newsletter() {
             className="mx-auto mt-8 flex max-w-xl flex-col gap-3 sm:flex-row sm:items-stretch"
           >
             <label htmlFor={inputId} className="sr-only">
-              Email address
+              {t('common.email')}
             </label>
             <input
               id={inputId}
@@ -64,16 +68,16 @@ export function Newsletter() {
               className="h-12 flex-1 rounded-2xl border-0 bg-white px-4 text-ink shadow-sm"
             />
             <Button type="submit" variant="accent" size="lg" className="rounded-2xl sm:px-8">
-              Subscribe
+              {t('home.subscribe')}
             </Button>
           </form>
 
           {status === 'success' ? (
             <p className="mt-3 text-sm text-blue-100" role="status">
-              Thanks — you are on the placeholder list.
+              {t('common.success')}
             </p>
           ) : (
-            <p className="mt-3 text-xs text-blue-100/80">No spam. Unsubscribe anytime.</p>
+            <p className="mt-3 text-xs text-blue-100/80">{t('home.newsletterDescription')}</p>
           )}
         </motion.div>
       </Container>

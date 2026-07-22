@@ -1,0 +1,98 @@
+{
+  "generatedAt": "2026-07-21T23:38:35.291Z",
+  "context": {
+    "runId": "s4c-1784677089918-c9365e",
+    "employerUserId": "c04e3dd0-d9d6-4707-a58c-3971224569ea",
+    "employerId": "e85301c5-448c-42c4-a6e4-5b64fb179c60",
+    "adminUserId": "935189e2-4f47-4f63-8656-1ebecbdb0b85",
+    "applicantUserId": "76aca121-b019-4f5e-a795-9207c1667a08",
+    "jobId": "f1dd66d3-60d9-40d2-9f6b-55a44a4aaf66",
+    "paymentId": "3ddb20ec-c38a-4ff6-a102-f59ea4e56d5c",
+    "auditId": "80138d27-e0d9-47c0-890d-9c42433ff54c"
+  },
+  "counts": {
+    "PASS": 13,
+    "FAIL": 0,
+    "BLOCKED": 0
+  },
+  "steps": [
+    {
+      "step": 1,
+      "name": "Employer registration",
+      "status": "PASS",
+      "evidence": "Registered employer user c04e3dd0-d9d6-4707-a58c-3971224569ea; employers row e85301c5-448c-42c4-a6e4-5b64fb179c60 status=pending."
+    },
+    {
+      "step": 2,
+      "name": "Employer approval workflow",
+      "status": "PASS",
+      "evidence": "Admin 935189e2-4f47-4f63-8656-1ebecbdb0b85 approved employer e85301c5-448c-42c4-a6e4-5b64fb179c60 → active/verified."
+    },
+    {
+      "step": 3,
+      "name": "Employer login",
+      "status": "PASS",
+      "evidence": "Employer signed in; session issued for s4.employer.s4c-1784677089918-c9365e@example.invalid."
+    },
+    {
+      "step": 4,
+      "name": "Employer dashboard",
+      "status": "PASS",
+      "evidence": "Employer dashboard data loaded: company=Sprint4 Employer s4c-1784677089918-c9365e, jobs=0."
+    },
+    {
+      "step": 5,
+      "name": "Job posting",
+      "status": "PASS",
+      "evidence": "Approved employer published job f1dd66d3-60d9-40d2-9f6b-55a44a4aaf66."
+    },
+    {
+      "step": 6,
+      "name": "Payment creation",
+      "status": "PASS",
+      "evidence": "Created pending payment 3ddb20ec-c38a-4ff6-a102-f59ea4e56d5c amount=39."
+    },
+    {
+      "step": 7,
+      "name": "Payment verification",
+      "status": "PASS",
+      "evidence": "GET /api/payments/mine returned pending payment 3ddb20ec-c38a-4ff6-a102-f59ea4e56d5c."
+    },
+    {
+      "step": 8,
+      "name": "Payment failure handling",
+      "status": "PASS",
+      "evidence": "Failure matrix: unauth=401, badPayload=400, checkoutWithoutUsableStripe=503, webhook=503 (Stripe webhook is not configured.)."
+    },
+    {
+      "step": 9,
+      "name": "Payment success handling",
+      "status": "PASS",
+      "evidence": "Payment 3ddb20ec-c38a-4ff6-a102-f59ea4e56d5c marked succeeded (webhook-equivalent) and visible via /mine."
+    },
+    {
+      "step": 10,
+      "name": "Database records",
+      "status": "PASS",
+      "evidence": "DB confirmed employer=e85301c5-448c-42c4-a6e4-5b64fb179c60, job=f1dd66d3-60d9-40d2-9f6b-55a44a4aaf66, payment=3ddb20ec-c38a-4ff6-a102-f59ea4e56d5c/succeeded."
+    },
+    {
+      "step": 11,
+      "name": "Security and permissions",
+      "status": "PASS",
+      "evidence": "pendingJobDenied=true; paymentSelfMarkBlocked=true; selfApproveBlocked=true; employerStillPending=true."
+    },
+    {
+      "step": 12,
+      "name": "Admin approval workflow",
+      "status": "PASS",
+      "evidence": "Admin role assigned via CLI; approval persisted on employers row."
+    },
+    {
+      "step": 13,
+      "name": "Audit logs",
+      "status": "PASS",
+      "evidence": "POST /api/audit → 202 id=f2efcba7-481b-4009-9117-9116bbfdd2a7; write_activity_log id=80138d27-e0d9-47c0-890d-9c42433ff54c; persisted=true."
+    }
+  ]
+}

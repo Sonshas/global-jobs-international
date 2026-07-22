@@ -1,12 +1,15 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { AuthLayout } from '@/components/auth/AuthLayout';
-import { AuthCard } from '@/components/auth/AuthCard';
+import { useTranslation } from 'react-i18next';
 import { FormAlert } from '@/components/auth/FormFields';
+import { RegistrationAtmosphere } from '@/components/auth/RegistrationAtmosphere';
+import { RegistrationProgress } from '@/components/auth/RegistrationProgress';
 import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/hooks/useAuth';
+import { sendLifecycleEmail } from '@/data/email-automation';
 
 export function VerifyEmailPage() {
+  const { t } = useTranslation();
   const { user, resendVerification, isAuthenticated, isEmailVerified, signOut } = useAuth();
   const [params] = useSearchParams();
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
@@ -16,22 +19,36 @@ export function VerifyEmailPage() {
     return params.get('email') || user?.email || '';
   }, [params, user?.email]);
 
+  const verifiedEmailSent = useRef(false);
+  useEffect(() => {
+    if (!isAuthenticated || !isEmailVerified || verifiedEmailSent.current) return;
+    verifiedEmailSent.current = true;
+    const name =
+      typeof user?.user_metadata?.full_name === 'string' ? user.user_metadata.full_name : '';
+    if (user?.email) {
+      sendLifecycleEmail('email_verified', { to: user.email, variables: { name } });
+    }
+  }, [isAuthenticated, isEmailVerified, user?.email, user?.user_metadata?.full_name]);
+
   if (isAuthenticated && isEmailVerified) {
     return (
-      <AuthLayout title="Email verified" subtitle="Your account is ready.">
-        <AuthCard>
-          <FormAlert variant="success">Your email is verified. Continue to your dashboard.</FormAlert>
+      <VerifyShell>
+        <RegistrationProgress currentStep={3} />
+        <section className="rounded-[1.75rem] border border-white/15 bg-white/[0.08] p-6 shadow-2xl shadow-black/40 backdrop-blur-xl sm:p-8">
+          <FormAlert variant="success" tone="glass">
+            {t('auth.verified')}
+          </FormAlert>
           <Button href="/dashboard" className="mt-4 w-full rounded-2xl">
-            Go to dashboard
+            {t('auth.goToDashboard')}
           </Button>
-        </AuthCard>
-      </AuthLayout>
+        </section>
+      </VerifyShell>
     );
   }
 
   const handleResend = async () => {
     if (!email) {
-      setError('Enter the email you used during registration, then try again from the sign-up page.');
+      setError(t('auth.verifyEmailMissing'));
       setStatus('error');
       return;
     }
@@ -48,27 +65,20 @@ export function VerifyEmailPage() {
   };
 
   return (
-    <AuthLayout
-      title="Verify your email"
-      subtitle="We sent a confirmation link to activate your applicant account."
-    >
-      <AuthCard>
+    <VerifyShell>
+      <RegistrationProgress currentStep={3} />
+      <section className="rounded-[1.75rem] border border-white/15 bg-white/[0.08] p-6 shadow-2xl shadow-black/40 backdrop-blur-xl sm:p-8">
         <div className="space-y-4">
-          <FormAlert variant="info">
-            {email ? (
-              <>
-                Check <strong>{email}</strong> for a verification message from Global Jobs
-                International. Open the link to continue.
-              </>
-            ) : (
-              <>Check your inbox for a verification message, then open the link to continue.</>
-            )}
+          <FormAlert variant="info" tone="glass">
+            {email ? t('auth.verifyCheckEmail', { email }) : t('auth.verifyCheckInbox')}
           </FormAlert>
 
           {status === 'sent' ? (
-            <FormAlert variant="success">Verification email resent. Please check your inbox.</FormAlert>
+            <FormAlert variant="success" tone="glass">
+              {t('auth.verifyResent')}
+            </FormAlert>
           ) : null}
-          {error ? <FormAlert>{error}</FormAlert> : null}
+          {error ? <FormAlert tone="glass">{error}</FormAlert> : null}
 
           <Button
             type="button"
@@ -76,34 +86,69 @@ export function VerifyEmailPage() {
             disabled={status === 'sending' || !email}
             onClick={() => void handleResend()}
           >
-            {status === 'sending' ? 'Resending…' : 'Resend verification email'}
+            {status === 'sending' ? t('auth.resending') : t('auth.resendVerification')}
           </Button>
 
           <Button href="/login" variant="secondary" className="w-full rounded-2xl">
-            Back to sign in
+            {t('auth.backToSignIn')}
           </Button>
 
           {isAuthenticated ? (
             <button
               type="button"
-              className="w-full text-sm font-medium text-ink-muted hover:text-ink dark:text-ink-muted-dark dark:hover:text-ink-dark"
+              className="w-full text-sm font-medium text-slate-300 hover:text-white"
               onClick={() => void signOut()}
             >
-              Sign out
+              {t('nav.signOut')}
             </button>
           ) : (
-            <p className="text-center text-sm text-ink-muted dark:text-ink-muted-dark">
-              Used the wrong email?{' '}
-              <Link
-                to="/register"
-                className="font-semibold text-brand hover:underline dark:text-brand-light"
-              >
-                Register again
+            <p className="text-center text-sm text-slate-300">
+              {t('auth.verifyWrongEmail')}{' '}
+              <Link to="/register" className="font-semibold text-accent hover:underline">
+                {t('auth.registerAgain')}
               </Link>
             </p>
           )}
         </div>
-      </AuthCard>
-    </AuthLayout>
+      </section>
+    </VerifyShell>
+  );
+}
+
+function VerifyShell({ children }: { children: ReactNode }) {
+  const { t } = useTranslation();
+  return (
+    <div className="relative min-h-screen overflow-x-hidden text-white">
+      <RegistrationAtmosphere />
+      <div className="relative z-10">
+        <header className="border-b border-white/10 bg-slate-950/40 backdrop-blur-md">
+          <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
+            <Link to="/" className="font-heading text-lg font-bold tracking-tight text-white">
+              Global Jobs <span className="text-accent">International</span>
+            </Link>
+            <Link
+              to="/login"
+              className="text-sm font-semibold text-slate-200 transition hover:text-white"
+            >
+              {t('auth.signIn')}
+            </Link>
+          </div>
+        </header>
+        <main className="mx-auto max-w-xl px-4 py-10 sm:px-6 sm:py-14">
+          <div className="mb-8 text-center sm:text-left">
+            <p className="text-sm font-semibold tracking-[0.18em] text-accent uppercase">
+              {t('auth.verifyEmailEyebrow')}
+            </p>
+            <h1 className="mt-3 font-heading text-3xl font-bold tracking-tight text-white">
+              {t('auth.verifyTitle')}
+            </h1>
+            <p className="mt-3 text-sm leading-relaxed text-slate-300 sm:text-base">
+              {t('auth.verifyActivateDesc')}
+            </p>
+          </div>
+          {children}
+        </main>
+      </div>
+    </div>
   );
 }

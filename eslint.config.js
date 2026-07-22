@@ -13,6 +13,8 @@ export default tseslint.config(
       '**/coverage/**',
       '**/*.tsbuildinfo',
       '**/scripts/**',
+      'e2e/**',
+      'playwright.config.ts',
     ],
   },
   js.configs.recommended,

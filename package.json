@@ -21,14 +21,19 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "typecheck": "npm run typecheck -w shared && npm run typecheck -w server && npm run typecheck -w client"
+    "typecheck": "npm run typecheck -w shared && npm run typecheck -w server && npm run typecheck -w client",
+    "test:e2e": "playwright test",
+    "test:e2e:staging": "cross-env E2E_SKIP_WEB_SERVER=1 playwright test",
+    "test:e2e:ui": "playwright test --ui"
   },
   "engines": {
     "node": ">=20.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
+    "@playwright/test": "^1.56.1",
     "concurrently": "^9.2.1",
+    "cross-env": "^10.1.0",
     "eslint": "^9.39.1",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-react-hooks": "^7.0.1",

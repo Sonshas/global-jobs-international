@@ -1,0 +1,124 @@
+{
+  "generatedAt": "2026-07-21T17:29:05.215Z",
+  "environment": {
+    "projectRef": "netbkjozigrfmlebvaob",
+    "serverUrlMatchesClient": true,
+    "serverAnonMatchesClient": true,
+    "serviceRoleConfigured": false,
+    "resendConfigured": false,
+    "envWarnings": [
+      "SUPABASE_SERVICE_ROLE_KEY is unset (OK for local Sprint 3 — verifier uses linked CLI; required on staging/production hosts)",
+      "RESEND_API_KEY is unset (OK for development — email uses provider=log; required for production delivery)"
+    ]
+  },
+  "context": {
+    "runId": "s3-1784654899140-08247054",
+    "applicantUserId": "a705f1f4-674f-4cd5-a92f-910976263536",
+    "applicantId": "1095d3c5-aa0a-4bda-b198-11eea2f20464",
+    "operatorUserId": "e65dfb63-9470-4a71-99bd-4fc33a7c18a3",
+    "applicationId": "cddd6690-d20b-43c4-ad09-8ca80550513f",
+    "documentId": "8e00086c-8a96-4574-a081-a13531495437",
+    "notificationId": "62c79c12-4696-4842-824e-e875b08b124d",
+    "visaProgressId": "42692515-068f-492b-a7b7-7b197d0ce9c2"
+  },
+  "counts": {
+    "PASS": 15,
+    "FAIL": 0,
+    "BLOCKED": 0
+  },
+  "steps": [
+    {
+      "step": 1,
+      "name": "Applicant registers",
+      "status": "PASS",
+      "evidence": "Created authenticated applicant a705f1f4-674f-4cd5-a92f-910976263536."
+    },
+    {
+      "step": 2,
+      "name": "Applicant completes profile",
+      "status": "PASS",
+      "evidence": "Confirmed trigger-created user/applicant rows and updated applicant 1095d3c5-aa0a-4bda-b198-11eea2f20464."
+    },
+    {
+      "step": 3,
+      "name": "Applicant uploads PDF document",
+      "status": "PASS",
+      "evidence": "Uploaded private PDF and inserted documents row 8e00086c-8a96-4574-a081-a13531495437."
+    },
+    {
+      "step": 4,
+      "name": "Applicant applies with timeline and visa",
+      "status": "PASS",
+      "evidence": "Created application cddd6690-d20b-43c4-ad09-8ca80550513f, timeline, and visa_progress 42692515-068f-492b-a7b7-7b197d0ce9c2."
+    },
+    {
+      "step": 5,
+      "name": "Operator receives application",
+      "status": "PASS",
+      "evidence": "CLI-provisioned admin/employer e65dfb63-9470-4a71-99bd-4fc33a7c18a3 read the application."
+    },
+    {
+      "step": 6,
+      "name": "Operator shortlists applicant",
+      "status": "PASS",
+      "evidence": "Operator changed status to shortlisted and appended timeline event."
+    },
+    {
+      "step": 7,
+      "name": "In-app notification inserts",
+      "status": "PASS",
+      "evidence": "Applicant self-inserted notification 62c79c12-4696-4842-824e-e875b08b124d."
+    },
+    {
+      "step": 8,
+      "name": "Email delivery path works",
+      "status": "PASS",
+      "evidence": "Authenticated self-email returned provider=log; development log mode."
+    },
+    {
+      "step": 9,
+      "name": "Staff advances pipeline stage",
+      "status": "PASS",
+      "evidence": "Operator advanced pipeline to interview and appended timeline event."
+    },
+    {
+      "step": 10,
+      "name": "Visa tracker updates",
+      "status": "PASS",
+      "evidence": "Operator updated visa_progress tracker (canonical visa record)."
+    },
+    {
+      "step": 11,
+      "name": "Applicant sees DB timeline update",
+      "status": "PASS",
+      "evidence": "Applicant re-read 4 DB-visible timeline events; UI polls applications every 15 seconds."
+    },
+    {
+      "step": 12,
+      "name": "Operator reads complete history",
+      "status": "PASS",
+      "evidence": "Operator read 3 immutable status-history event(s) and metadata timeline."
+    },
+    {
+      "step": 13,
+      "name": "Supabase persistence checks",
+      "status": "PASS",
+      "evidence": "Application, document, notification, visa progress, and status/timeline events persist in Supabase."
+    },
+    {
+      "step": 14,
+      "name": "RBAC negative checks",
+      "status": "PASS",
+      "evidence": "Outsider cannot read admin_users, update another application, or assign roles."
+    },
+    {
+      "step": 15,
+      "name": "Results and evidence written",
+      "status": "PASS",
+      "evidence": "Verification JSON and Markdown evidence were written."
+    }
+  ],
+  "remainingExternalBlockers": [
+    "Production email delivery requires a configured Resend API key and verified sender; development log mode is sufficient for Sprint 3 verification."
+  ]
+}

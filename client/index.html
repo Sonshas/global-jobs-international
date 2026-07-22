@@ -13,12 +13,22 @@
       content="international jobs, work abroad, overseas careers, Global Jobs International"
     />
     <meta name="theme-color" content="#0052CC" />
+    <!-- og:url should be the deployed site's canonical origin (set per-environment, e.g. https://www.globaljobsinternational.com/) -->
+    <meta property="og:url" content="/" />
     <meta property="og:title" content="Global Jobs International" />
     <meta
       property="og:description"
       content="Find your dream job abroad. Connect with trusted international employers around the world."
     />
     <meta property="og:type" content="website" />
+    <meta property="og:image" content="/og-image.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Global Jobs International" />
+    <meta
+      name="twitter:description"
+      content="Find your dream job abroad. Connect with trusted international employers around the world."
+    />
+    <meta name="twitter:image" content="/og-image.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -31,7 +41,8 @@
         try {
           var stored = localStorage.getItem('gji-theme');
           var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-          var theme = stored === 'light' || stored === 'dark' ? stored : prefersDark ? 'dark' : 'light';
+          var preference = stored === 'light' || stored === 'dark' || stored === 'system' ? stored : 'system';
+          var theme = preference === 'system' ? (prefersDark ? 'dark' : 'light') : preference;
           document.documentElement.classList.toggle('dark', theme === 'dark');
           document.documentElement.style.colorScheme = theme;
         } catch (_) {}

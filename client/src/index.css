@@ -126,4 +126,135 @@
       linear-gradient(rgba(26, 107, 255, 0.08) 1px, transparent 1px),
       linear-gradient(90deg, rgba(26, 107, 255, 0.08) 1px, transparent 1px);
   }
+
+  .hero-aurora {
+    background:
+      radial-gradient(ellipse 60% 40% at 15% 20%, rgba(0, 82, 204, 0.35), transparent 60%),
+      radial-gradient(ellipse 45% 35% at 80% 15%, rgba(26, 107, 255, 0.28), transparent 55%),
+      radial-gradient(ellipse 50% 40% at 70% 75%, rgba(244, 180, 0, 0.12), transparent 60%),
+      radial-gradient(ellipse 40% 30% at 30% 80%, rgba(56, 189, 248, 0.14), transparent 55%);
+    animation: hero-aurora-shift 18s ease-in-out infinite alternate;
+  }
+
+  .hero-globe-sphere {
+    background:
+      radial-gradient(circle at 32% 28%, rgba(147, 197, 253, 0.55), transparent 35%),
+      radial-gradient(circle at 65% 60%, rgba(0, 82, 204, 0.55), rgba(15, 23, 42, 0.75));
+    box-shadow:
+      0 0 60px rgba(0, 82, 204, 0.35),
+      inset -20px -10px 40px rgba(15, 23, 42, 0.45);
+  }
+
+  .hero-globe-grid {
+    background-image:
+      repeating-linear-gradient(
+        90deg,
+        transparent 0,
+        transparent 18px,
+        rgba(255, 255, 255, 0.12) 18px,
+        rgba(255, 255, 255, 0.12) 19px
+      ),
+      repeating-linear-gradient(
+        0deg,
+        transparent 0,
+        transparent 22px,
+        rgba(255, 255, 255, 0.1) 22px,
+        rgba(255, 255, 255, 0.1) 23px
+      );
+    mask-image: radial-gradient(circle, black 58%, transparent 72%);
+  }
+
+  .hero-globe-spin {
+    animation: hero-globe-rotate 60s linear infinite;
+  }
+
+  .hero-cloud-drift-a {
+    animation: hero-cloud-a 42s ease-in-out infinite alternate;
+  }
+
+  .hero-cloud-drift-b {
+    animation: hero-cloud-b 54s ease-in-out infinite alternate;
+  }
+
+  .hero-cloud-drift-c {
+    animation: hero-cloud-c 48s ease-in-out infinite alternate;
+  }
+
+  .hero-star-twinkle {
+    animation: hero-star 3.8s ease-in-out infinite;
+  }
+
+  @keyframes hero-aurora-shift {
+    0% {
+      transform: translate3d(0, 0, 0) scale(1);
+      filter: hue-rotate(0deg);
+    }
+    100% {
+      transform: translate3d(2%, -1%, 0) scale(1.05);
+      filter: hue-rotate(12deg);
+    }
+  }
+
+  @keyframes hero-globe-rotate {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes hero-cloud-a {
+    from {
+      transform: translate3d(0, 0, 0);
+    }
+    to {
+      transform: translate3d(6%, 3%, 0);
+    }
+  }
+
+  @keyframes hero-cloud-b {
+    from {
+      transform: translate3d(0, 0, 0);
+    }
+    to {
+      transform: translate3d(-5%, -2%, 0);
+    }
+  }
+
+  @keyframes hero-cloud-c {
+    from {
+      transform: translate3d(0, 0, 0);
+    }
+    to {
+      transform: translate3d(4%, -3%, 0);
+    }
+  }
+
+  @keyframes hero-star {
+    0%,
+    100% {
+      opacity: 0.25;
+      transform: scale(0.85);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.2);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-aurora,
+    .hero-globe-spin,
+    .hero-cloud-drift-a,
+    .hero-cloud-drift-b,
+    .hero-cloud-drift-c,
+    .hero-star-twinkle {
+      animation: none !important;
+    }
+  }
+}
+
+html.rtl {
+  direction: rtl;
 }

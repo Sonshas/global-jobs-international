@@ -1,28 +1,32 @@
-import { useId, useState } from 'react';
-import { languages } from '@/data/homepage';
+import { useId } from 'react';
+import { useTranslation } from 'react-i18next';
+import { appLanguages } from '@/i18n/languages';
 
 export function LanguageSelector() {
   const listId = useId();
-  const [language, setLanguage] = useState<(typeof languages)[number]['code']>('en');
-  const current = languages.find((item) => item.code === language) ?? languages[0];
+  const { i18n, t } = useTranslation();
+  const current =
+    appLanguages.find((item) => item.code === i18n.resolvedLanguage) ??
+    appLanguages.find((item) => item.code === i18n.language) ??
+    appLanguages[0];
 
   return (
     <div className="relative">
       <label htmlFor={listId} className="sr-only">
-        Language
+        {t('nav.language')}
       </label>
       <select
         id={listId}
-        value={language}
-        onChange={(event) =>
-          setLanguage(event.target.value as (typeof languages)[number]['code'])
-        }
-        className="h-10 appearance-none rounded-xl border border-border bg-white py-2 pr-9 pl-3 text-sm font-medium text-ink transition-colors hover:bg-slate-50 dark:border-border-dark dark:bg-surface-elevated-dark dark:text-ink-dark dark:hover:bg-slate-700"
-        aria-label={`Language: ${current.label}`}
+        value={current.code}
+        onChange={(event) => {
+          void i18n.changeLanguage(event.target.value);
+        }}
+        className="h-10 max-w-[11rem] appearance-none rounded-xl border border-border bg-white py-2 pr-9 pl-3 text-sm font-medium text-ink transition-colors hover:bg-slate-50 dark:border-border-dark dark:bg-surface-elevated-dark dark:text-ink-dark dark:hover:bg-slate-700"
+        aria-label={`${t('nav.language')}: ${current.nativeLabel}`}
       >
-        {languages.map((item) => (
+        {appLanguages.map((item) => (
           <option key={item.code} value={item.code}>
-            {item.label}
+            {item.nativeLabel}
           </option>
         ))}
       </select>

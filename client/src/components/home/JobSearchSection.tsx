@@ -1,20 +1,37 @@
-import { useId, useState, type FormEvent } from 'react';
+import { useId, useMemo, useState, type FormEvent } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { motion, useReducedMotion } from 'framer-motion';
 import { Container } from '@/components/ui/Container';
 import { Button } from '@/components/ui/Button';
-import { jobCategories, searchCountries } from '@/data/homepage';
+import {
+  searchCategories,
+  searchCountryNames,
+  searchExperienceLevels,
+} from '@/data/jobs-catalog';
 
 export function JobSearchSection() {
+  const { t } = useTranslation();
   const formId = useId();
+  const navigate = useNavigate();
   const reduceMotion = useReducedMotion();
   const [country, setCountry] = useState('');
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState('');
-  const [submitted, setSubmitted] = useState(false);
+  const [experience, setExperience] = useState('');
+  const [salaryMin, setSalaryMin] = useState('');
+
+  const countries = useMemo(() => [...searchCountryNames].sort(), []);
 
   const onSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setSubmitted(true);
+    const params = new URLSearchParams();
+    if (country) params.set('country', country);
+    if (title.trim()) params.set('q', title.trim());
+    if (category) params.set('category', category);
+    if (experience) params.set('experience', experience);
+    if (salaryMin) params.set('salaryMin', salaryMin);
+    navigate(`/jobs?${params.toString()}`);
   };
 
   return (
@@ -25,7 +42,7 @@ export function JobSearchSection() {
     >
       <Container>
         <h2 id="search-heading" className="sr-only">
-          Search international job opportunities
+          {t('home.searchSrOnly')}
         </h2>
 
         <motion.form
@@ -34,24 +51,40 @@ export function JobSearchSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-40px' }}
           transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-          className="-mt-10 grid gap-4 rounded-3xl border border-border/70 bg-white p-5 shadow-[0_24px_60px_-28px_rgba(15,23,42,0.35)] sm:p-6 md:-mt-14 md:grid-cols-[1.1fr_1.3fr_1.1fr_auto] md:items-end dark:border-border-dark dark:bg-surface-elevated-dark dark:shadow-[0_24px_60px_-28px_rgba(0,0,0,0.65)]"
-          aria-describedby={submitted ? `${formId}-result` : undefined}
+          className="-mt-10 grid gap-4 rounded-3xl border border-border/60 bg-white/85 p-5 shadow-[0_24px_60px_-28px_rgba(15,23,42,0.35)] backdrop-blur-xl sm:p-6 md:-mt-14 md:grid-cols-2 xl:grid-cols-[1.2fr_1fr_1fr_1fr_1fr_auto] xl:items-end dark:border-border-dark dark:bg-slate-900/70"
         >
+          <div className="md:col-span-2 xl:col-span-1">
+            <label
+              htmlFor={`${formId}-title`}
+              className="mb-1.5 block text-xs font-semibold tracking-wide text-slate-600 uppercase dark:text-slate-300"
+            >
+              {t('home.searchJobLabel')}
+            </label>
+            <input
+              id={`${formId}-title`}
+              type="search"
+              value={title}
+              onChange={(event) => setTitle(event.target.value)}
+              placeholder={t('home.searchJobPlaceholder')}
+              className="h-12 w-full rounded-2xl border border-slate-300 bg-white px-4 text-sm font-medium text-slate-900 outline-none transition focus:border-brand dark:border-slate-600 dark:bg-slate-950 dark:text-white"
+            />
+          </div>
+
           <div>
             <label
               htmlFor={`${formId}-country`}
-              className="mb-1.5 block text-xs font-semibold tracking-wide text-ink-muted uppercase dark:text-ink-muted-dark"
+              className="mb-1.5 block text-xs font-semibold tracking-wide text-slate-600 uppercase dark:text-slate-300"
             >
-              Country
+              {t('common.country')}
             </label>
             <select
               id={`${formId}-country`}
               value={country}
               onChange={(event) => setCountry(event.target.value)}
-              className="h-12 w-full rounded-2xl border border-border bg-[var(--bg)] px-4 text-sm font-medium outline-none transition focus:border-brand dark:border-border-dark"
+              className="h-12 w-full rounded-2xl border border-slate-300 bg-white px-4 text-sm font-medium text-slate-900 outline-none transition focus:border-brand dark:border-slate-600 dark:bg-slate-950 dark:text-white"
             >
-              <option value="">All countries</option>
-              {searchCountries.map((item) => (
+              <option value="">{t('countries.allCountries')}</option>
+              {countries.map((item) => (
                 <option key={item} value={item}>
                   {item}
                 </option>
@@ -61,36 +94,62 @@ export function JobSearchSection() {
 
           <div>
             <label
-              htmlFor={`${formId}-title`}
-              className="mb-1.5 block text-xs font-semibold tracking-wide text-ink-muted uppercase dark:text-ink-muted-dark"
-            >
-              Job Title
-            </label>
-            <input
-              id={`${formId}-title`}
-              type="search"
-              value={title}
-              onChange={(event) => setTitle(event.target.value)}
-              placeholder="e.g. Nurse, Engineer"
-              className="h-12 w-full rounded-2xl border border-border bg-[var(--bg)] px-4 text-sm font-medium outline-none transition focus:border-brand dark:border-border-dark"
-            />
-          </div>
-
-          <div>
-            <label
               htmlFor={`${formId}-category`}
-              className="mb-1.5 block text-xs font-semibold tracking-wide text-ink-muted uppercase dark:text-ink-muted-dark"
+              className="mb-1.5 block text-xs font-semibold tracking-wide text-slate-600 uppercase dark:text-slate-300"
             >
-              Category
+              {t('home.jobCategory')}
             </label>
             <select
               id={`${formId}-category`}
               value={category}
               onChange={(event) => setCategory(event.target.value)}
-              className="h-12 w-full rounded-2xl border border-border bg-[var(--bg)] px-4 text-sm font-medium outline-none transition focus:border-brand dark:border-border-dark"
+              className="h-12 w-full rounded-2xl border border-slate-300 bg-white px-4 text-sm font-medium text-slate-900 outline-none transition focus:border-brand dark:border-slate-600 dark:bg-slate-950 dark:text-white"
             >
-              <option value="">All categories</option>
-              {jobCategories.map((item) => (
+              <option value="">{t('home.allJobs')}</option>
+              {searchCategories.map((item) => (
+                <option key={item} value={item}>
+                  {item}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label
+              htmlFor={`${formId}-salary`}
+              className="mb-1.5 block text-xs font-semibold tracking-wide text-slate-600 uppercase dark:text-slate-300"
+            >
+              {t('home.minSalary')}
+            </label>
+            <select
+              id={`${formId}-salary`}
+              value={salaryMin}
+              onChange={(event) => setSalaryMin(event.target.value)}
+              className="h-12 w-full rounded-2xl border border-slate-300 bg-white px-4 text-sm font-medium text-slate-900 outline-none transition focus:border-brand dark:border-slate-600 dark:bg-slate-950 dark:text-white"
+            >
+              <option value="">{t('home.any')}</option>
+              <option value="2000">2,000+</option>
+              <option value="3000">3,000+</option>
+              <option value="4000">4,000+</option>
+              <option value="5000">5,000+</option>
+            </select>
+          </div>
+
+          <div>
+            <label
+              htmlFor={`${formId}-experience`}
+              className="mb-1.5 block text-xs font-semibold tracking-wide text-slate-600 uppercase dark:text-slate-300"
+            >
+              {t('jobs.experience')}
+            </label>
+            <select
+              id={`${formId}-experience`}
+              value={experience}
+              onChange={(event) => setExperience(event.target.value)}
+              className="h-12 w-full rounded-2xl border border-slate-300 bg-white px-4 text-sm font-medium text-slate-900 outline-none transition focus:border-brand dark:border-slate-600 dark:bg-slate-950 dark:text-white"
+            >
+              <option value="">{t('home.any')}</option>
+              {searchExperienceLevels.map((item) => (
                 <option key={item} value={item}>
                   {item}
                 </option>
@@ -99,21 +158,8 @@ export function JobSearchSection() {
           </div>
 
           <Button type="submit" className="h-12 min-w-[8.5rem] rounded-2xl px-6" size="md">
-            Search
+            {t('common.search')}
           </Button>
-
-          {submitted ? (
-            <p
-              id={`${formId}-result`}
-              className="md:col-span-4 text-sm text-ink-muted dark:text-ink-muted-dark"
-              role="status"
-            >
-              Showing placeholder results
-              {title ? ` for “${title}”` : ''}
-              {country ? ` in ${country}` : ''}
-              {category ? ` · ${category}` : ''}.
-            </p>
-          ) : null}
         </motion.form>
       </Container>
     </section>

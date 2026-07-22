@@ -5,9 +5,29 @@ type AnimatedCounterProps = {
   value: number;
   suffix?: string;
   duration?: number;
+  format?: 'standard' | 'compact';
 };
 
-export function AnimatedCounter({ value, suffix = '', duration = 1.6 }: AnimatedCounterProps) {
+function formatDisplay(value: number, format: 'standard' | 'compact') {
+  if (format === 'compact') {
+    if (value >= 1_000_000) {
+      const millions = value / 1_000_000;
+      return `${millions.toFixed(millions >= 10 ? 0 : 1).replace(/\.0$/, '')}M`;
+    }
+    if (value >= 1_000) {
+      const thousands = value / 1_000;
+      return `${thousands.toFixed(thousands >= 100 ? 0 : 1).replace(/\.0$/, '')}K`;
+    }
+  }
+  return value.toLocaleString();
+}
+
+export function AnimatedCounter({
+  value,
+  suffix = '',
+  duration = 1.6,
+  format = 'standard',
+}: AnimatedCounterProps) {
   const ref = useRef<HTMLSpanElement>(null);
   const isInView = useInView(ref, { once: true, margin: '-40px' });
   const reduceMotion = useReducedMotion();
@@ -37,9 +57,9 @@ export function AnimatedCounter({ value, suffix = '', duration = 1.6 }: Animated
   return (
     <span
       ref={ref}
-      className="font-heading text-4xl font-bold tracking-tight text-ink tabular-nums sm:text-5xl dark:text-ink-dark"
+      className="font-heading text-3xl font-bold tracking-tight text-ink tabular-nums sm:text-4xl dark:text-ink-dark"
     >
-      {display.toLocaleString()}
+      {formatDisplay(display, format)}
       {suffix}
     </span>
   );

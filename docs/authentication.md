@@ -6,13 +6,19 @@ The React client uses Supabase Auth (email + password) with PKCE.
 
 ## Required environment variables
 
+See `docs/environments.md` for development / staging / production.
+
 Create `client/.env`:
 
 ```env
+VITE_APP_ENV=development
 VITE_SUPABASE_URL=https://YOUR_PROJECT.supabase.co
 VITE_SUPABASE_ANON_KEY=YOUR_ANON_KEY
+VITE_STRICT_RBAC=true
+VITE_ALLOW_DEMO_ADMIN=false
 ```
 
+Roles are assigned in Postgres (`public.assign_user_role`) — see `docs/rbac.md`.
 ## Supabase dashboard settings
 
 1. Authentication → Providers → Email enabled

@@ -1,6 +1,9 @@
-# Supabase config placeholder
-# Link this project with: npx supabase link --project-ref <ref>
-
+# Supabase local / CLI configuration
+# Link environments with: npx supabase link --project-ref <ref>
+# Push schema: npx supabase db push
+#
+# Use a SEPARATE project ref for development, staging, and production.
+# See docs/environments.md
 
 [api]
 enabled = true

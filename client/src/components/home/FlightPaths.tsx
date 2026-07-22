@@ -1,6 +1,20 @@
 import { motion, useReducedMotion } from 'framer-motion';
 import { flightRoutes, mapLocations } from '@/data/homepage';
 
+function AirplaneIcon({ className }: { className?: string }) {
+  return (
+    <g className={className}>
+      <path
+        d="M-10 0 L8 -3.5 L10 0 L8 3.5 Z M-2 -1 L-6 -6 L-4 -6 L1 -1.5 M-2 1 L-6 6 L-4 6 L1 1.5"
+        fill="#F4B400"
+        stroke="#0F172A"
+        strokeWidth="0.4"
+        strokeLinejoin="round"
+      />
+    </g>
+  );
+}
+
 export function FlightPaths() {
   const reduceMotion = useReducedMotion();
 
@@ -38,23 +52,22 @@ export function FlightPaths() {
             className="opacity-80 dark:opacity-70"
           />
           {!reduceMotion ? (
-            <motion.circle
-              r="3.5"
-              fill="#F4B400"
-              filter="url(#markerGlow)"
+            <motion.g
               initial={false}
               animate={{ offsetDistance: ['0%', '100%'] }}
               transition={{
-                duration: 6.5,
+                duration: 9,
                 repeat: Infinity,
                 ease: 'linear',
                 delay: route.delay,
               }}
               style={{
                 offsetPath: `path('${route.d}')`,
-                offsetRotate: '0deg',
+                offsetRotate: 'auto',
               }}
-            />
+            >
+              <AirplaneIcon />
+            </motion.g>
           ) : null}
         </g>
       ))}
@@ -75,7 +88,12 @@ export function FlightPaths() {
               }}
             />
           ) : null}
-          <circle r="5.5" fill="#0052CC" filter="url(#markerGlow)" className="dark:fill-brand-light" />
+          <circle
+            r="5.5"
+            fill="#0052CC"
+            filter="url(#markerGlow)"
+            className="dark:fill-brand-light"
+          />
           <circle r="2.2" fill="#F4B400" />
         </g>
       ))}

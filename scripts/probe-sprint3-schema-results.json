@@ -1,0 +1,126 @@
+{
+  "generatedAt": "2026-07-21T23:37:23.736Z",
+  "runId": "sprint3-schema-1784677043734-c4433f67",
+  "target": {
+    "projectRef": "netbkjozigrfmlebvaob",
+    "urlConfigured": true,
+    "anonKeyConfigured": true
+  },
+  "repoMigrations": {
+    "migration000014": {
+      "path": "supabase/migrations/20260721000014_document_storage.sql",
+      "exists": true,
+      "declaresDocumentsBucket": true,
+      "declaresDocumentTypes": true
+    },
+    "migration000015": {
+      "path": "supabase/migrations/20260721000015_pipeline_notifications_comms.sql",
+      "exists": true,
+      "declaresPrivilegedNotificationInsertPolicy": true,
+      "allowsSelfNotificationInsert": true
+    },
+    "migration000016": {
+      "path": "supabase/migrations/20260721000016_ensure_documents_bucket.sql",
+      "exists": true,
+      "repairsDocumentsBucket": true,
+      "reappliesStoragePolicies": true
+    },
+    "migration000017": {
+      "path": "supabase/migrations/20260721000017_harden_role_assignment_rpc.sql",
+      "exists": true,
+      "revokesAuthenticatedRoleAssignment": true
+    }
+  },
+  "localTooling": {
+    "linkedProjectRef": "netbkjozigrfmlebvaob",
+    "supabaseCli": {
+      "available": true,
+      "output": "2.109.1\nnpm warn Unknown env config \"devdir\". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options."
+    },
+    "docker": {
+      "available": false,
+      "error": "spawn docker ENOENT"
+    }
+  },
+  "serverEnv": {
+    "supabaseUrlPresent": true,
+    "supabaseUrlPlaceholder": false,
+    "serviceRolePresent": false,
+    "serviceRolePlaceholder": true,
+    "resendPresent": false,
+    "resendPlaceholder": true
+  },
+  "liveProject": {
+    "authentication": {
+      "status": "AUTHENTICATED_THROWAWAY_USER",
+      "userId": "a81318f2-3b8a-4812-8d95-edef05d5d09b"
+    },
+    "rpcs": {
+      "ensure_catalog_job": {
+        "status": "PRESENT_BUT_REJECTED",
+        "evidence": "duplicate key value violates unique constraint \"jobs_employer_slug_unique\""
+      },
+      "next_gji_application_number": {
+        "status": "PRESENT_AND_CALLABLE",
+        "returnedValue": "string"
+      },
+      "assign_user_role": {
+        "status": "PRESENT_BUT_UNAUTHORIZED",
+        "evidence": "permission denied for function assign_user_role"
+      },
+      "seed_platform_employer": {
+        "status": "PRESENT_BUT_REJECTED",
+        "evidence": "owner user does not exist in public.users"
+      }
+    },
+    "tables": {
+      "applications": {
+        "status": "PRESENT",
+        "countVisibleToProbe": null
+      },
+      "visa_progress": {
+        "status": "PRESENT",
+        "countVisibleToProbe": null
+      },
+      "notifications": {
+        "status": "PRESENT",
+        "countVisibleToProbe": null
+      },
+      "application_status_history": {
+        "status": "PRESENT",
+        "countVisibleToProbe": null
+      },
+      "documents": {
+        "status": "PRESENT",
+        "countVisibleToProbe": null
+      },
+      "document_types": {
+        "status": "PRESENT",
+        "countVisibleToProbe": null
+      }
+    },
+    "storage": {
+      "documentsBucket": {
+        "status": "MISSING",
+        "evidence": "listBuckets succeeded but did not return a documents bucket."
+      }
+    },
+    "migrationArtifacts": {
+      "notificationInsertPolicy": {
+        "selfInsert": {
+          "status": "ALLOWED",
+          "evidence": "Authenticated throwaway user inserted its own notification."
+        },
+        "crossUserInsert": {
+          "status": "PRESENT_BUT_UNAUTHORIZED",
+          "evidence": "new row violates row-level security policy for table \"notifications\""
+        },
+        "interpretation": "Behavior matches the self-or-privileged intent of migration 000015, but cannot prove the live policy name or migration history."
+      },
+      "documentStorage": {
+        "status": "MISSING",
+        "evidence": "Migration 000014 bucket presence is assessed through storage.listBuckets."
+      }
+    }
+  }
+}

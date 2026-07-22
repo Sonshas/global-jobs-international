@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0B1F44" />
+      <stop offset="55%" stop-color="#0052CC" />
+      <stop offset="100%" stop-color="#0F766E" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)" />
+  <text x="80" y="300" font-family="Poppins, Arial, sans-serif" font-size="72" font-weight="700" fill="#FFFFFF">
+    Global Jobs International
+  </text>
+  <text x="80" y="370" font-family="Inter, Arial, sans-serif" font-size="34" font-weight="500" fill="#E2E8F0">
+    Find your dream job abroad
+  </text>
+  <text x="80" y="420" font-family="Inter, Arial, sans-serif" font-size="26" fill="#CBD5E1">
+    Verified international employers · Visa support · Guided placement
+  </text>
+</svg>

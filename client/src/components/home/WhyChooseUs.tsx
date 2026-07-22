@@ -1,10 +1,12 @@
 import { motion, useReducedMotion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { Container } from '@/components/ui/Container';
 import { SectionHeading } from '@/components/ui/SectionHeading';
 import { FeatureIcon } from '@/components/ui/FeatureIcon';
 import { whyChooseUs } from '@/data/homepage';
 
 export function WhyChooseUs() {
+  const { t } = useTranslation();
   const reduceMotion = useReducedMotion();
 
   return (
@@ -16,9 +18,9 @@ export function WhyChooseUs() {
       <Container>
         <SectionHeading
           id="why-heading"
-          eyebrow="Why Choose Us"
-          title="Built for serious international careers"
-          description="Premium guidance, verified employers, and a process designed around clarity."
+          eyebrow={t('home.whyTitle')}
+          title={t('home.whyTitle')}
+          description={t('home.whyDescription')}
         />
 
         <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
@@ -30,7 +32,7 @@ export function WhyChooseUs() {
               viewport={{ once: true, margin: '-40px' }}
               transition={{ duration: 0.45, delay: index * 0.07 }}
               whileHover={reduceMotion ? undefined : { y: -4 }}
-              className="rounded-3xl border border-border bg-[var(--bg)] p-6 shadow-sm dark:border-border-dark"
+              className="rounded-3xl border border-border/70 bg-white/80 p-6 shadow-sm backdrop-blur-xl dark:border-border-dark dark:bg-slate-900/50"
             >
               <motion.div
                 initial={reduceMotion ? false : { scale: 0.85, opacity: 0 }}
@@ -42,10 +44,10 @@ export function WhyChooseUs() {
                 <FeatureIcon name={item.icon} />
               </motion.div>
               <h3 className="font-heading text-xl font-semibold text-ink dark:text-ink-dark">
-                {item.title}
+                {t(`home.whyItems.${item.id}.title`, { defaultValue: item.title })}
               </h3>
               <p className="mt-2 text-sm leading-relaxed text-ink-muted dark:text-ink-muted-dark">
-                {item.description}
+                {t(`home.whyItems.${item.id}.description`, { defaultValue: item.description })}
               </p>
             </motion.article>
           ))}

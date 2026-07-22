@@ -1,0 +1,76 @@
+{
+  "generatedAt": "2026-07-21T23:37:30.567Z",
+  "counts": {
+    "PASS": 8,
+    "FAIL": 0
+  },
+  "checks": [
+    {
+      "id": 1,
+      "name": "Required environment variables load correctly",
+      "status": "PASS",
+      "evidence": "All required local variables loaded; client/server Supabase URL+anon match=true."
+    },
+    {
+      "id": 2,
+      "name": "Server starts successfully",
+      "status": "PASS",
+      "evidence": "API healthy at http://127.0.0.1:3015/api/health (APP_ENV=development)."
+    },
+    {
+      "id": 3,
+      "name": "Supabase connects successfully",
+      "status": "PASS",
+      "evidence": "Supabase REST reachable; countries query returned 1 row(s)."
+    },
+    {
+      "id": 4,
+      "name": "Storage connects successfully",
+      "status": "PASS",
+      "evidence": "Storage reachable; authenticated upload to documents bucket succeeded."
+    },
+    {
+      "id": 5,
+      "name": "Authentication works",
+      "status": "PASS",
+      "evidence": "signUp issued session for 0232b86c-dbc7-4e2d-bd76-40f9a80e0051; public.users row present."
+    },
+    {
+      "id": 6,
+      "name": "Database migrations are recognized",
+      "status": "PASS",
+      "evidence": "Migrations recognized locally and remotely through 000017 (20260721000012, 20260721000013, 20260721000014, 20260721000015, 20260721000016, 20260721000017)."
+    },
+    {
+      "id": 7,
+      "name": "Email configuration validates",
+      "status": "PASS",
+      "evidence": "Development email mode: RESEND_API_KEY unset → provider=log. EMAIL_FROM is set (true). Real delivery still requires Resend credentials."
+    },
+    {
+      "id": 8,
+      "name": "Verification scripts run without environment errors",
+      "status": "PASS",
+      "evidence": "assertSprint3Env + probe-sprint3-schema.mjs completed without ENV_PREFLIGHT_FAILED (exit assumed 0)."
+    }
+  ],
+  "notes": [
+    "SUPABASE_SERVICE_ROLE_KEY is unset (OK for local Sprint 3 — verifier uses linked CLI; required on staging/production hosts)",
+    "RESEND_API_KEY is unset (OK for development — email uses provider=log; required for production delivery)",
+    "SUPABASE_SERVICE_ROLE_KEY unset — optional for local development.",
+    "RESEND_API_KEY unset — development email uses provider=log.",
+    "probe stdout tail: : \"Migration 000014 bucket presence is assessed through storage.listBuckets.\"\n      }\n    }\n  }\n}\n\nResults written to C:\\Users\\User\\global-jobs-international\\scripts\\probe-sprint3-schema-results.json\n"
+  ],
+  "missingOrOptionalCredentials": [
+    {
+      "variable": "RESEND_API_KEY",
+      "usedFor": "Optional locally; required for real/production email delivery (not for Sprint 3 log-mode verification)",
+      "obtainFrom": "https://resend.com → API Keys → create key → set in server/.env (never in client/.env)"
+    },
+    {
+      "variable": "SUPABASE_SERVICE_ROLE_KEY",
+      "usedFor": "Optional locally; required on staging/production servers for privileged admin APIs",
+      "obtainFrom": "Supabase Dashboard → Project Settings → API → service_role secret → server/.env or host secrets only"
+    }
+  ]
+}

@@ -1,0 +1,90 @@
+{
+  "generatedAt": "2026-07-21T20:45:53.303Z",
+  "environment": {
+    "projectRef": "netbkjozigrfmlebvaob",
+    "resendConfigured": false,
+    "envWarnings": [
+      "SUPABASE_SERVICE_ROLE_KEY is unset (OK for local Sprint 3 — verifier uses linked CLI; required on staging/production hosts)",
+      "RESEND_API_KEY is unset (OK for development — email uses provider=log; required for production delivery)"
+    ]
+  },
+  "context": {
+    "runId": "s5-1784666737774-4d6aea77",
+    "employerUserId": "5e760f4b-742e-4056-a284-08ee6578e8bb",
+    "employerId": "e7f490cb-4a89-4259-82de-692b2edd2632",
+    "jobId": "2b95fe07-fd65-47fb-a6c6-66b408fd0320",
+    "applicantUserId": "a6055f90-aa01-4905-ba70-2f819534b1b3",
+    "applicantId": "59a25688-6665-415d-bea0-93e28f092a1b",
+    "applicationId": "2d53f031-2325-4b1d-a00e-b05c3fbcfa7d",
+    "conversationId": "20db95e0-c3cc-419b-b81b-65b916b4d0b0",
+    "interviewId": "bf9f6de6-5f02-487c-b1bf-69047ef3f60e"
+  },
+  "counts": {
+    "PASS": 10,
+    "FAIL": 0,
+    "BLOCKED": 0
+  },
+  "steps": [
+    {
+      "step": 1,
+      "name": "Environment preflight",
+      "status": "PASS",
+      "evidence": "client/.env and server/.env required vars load and match."
+    },
+    {
+      "step": 2,
+      "name": "Employer registers (account_type=employer, employers row pending)",
+      "status": "PASS",
+      "evidence": "Employer signup 5e760f4b-742e-4056-a284-08ee6578e8bb auto-created employers row e7f490cb-4a89-4259-82de-692b2edd2632 with status=pending; profile fields updated by the owner."
+    },
+    {
+      "step": 3,
+      "name": "Employer approved by staff and publishes a job",
+      "status": "PASS",
+      "evidence": "Staff SQL approval promoted employer e7f490cb-4a89-4259-82de-692b2edd2632 to status=active/is_verified=true; employer then published job 2b95fe07-fd65-47fb-a6c6-66b408fd0320 (RLS can_manage_employer_jobs honored)."
+    },
+    {
+      "step": 4,
+      "name": "Applicant registers and submits an application",
+      "status": "PASS",
+      "evidence": "Applicant a6055f90-aa01-4905-ba70-2f819534b1b3 registered and submitted application 2d53f031-2325-4b1d-a00e-b05c3fbcfa7d for job 2b95fe07-fd65-47fb-a6c6-66b408fd0320."
+    },
+    {
+      "step": 5,
+      "name": "Saved job toggle round-trip (save, list, unsave)",
+      "status": "PASS",
+      "evidence": "Saved job 2b95fe07-fd65-47fb-a6c6-66b408fd0320 for applicant a6055f90-aa01-4905-ba70-2f819534b1b3, confirmed in list, then unsaved and confirmed removal."
+    },
+    {
+      "step": 6,
+      "name": "Messaging round-trip between applicant and employer",
+      "status": "PASS",
+      "evidence": "Conversation 20db95e0-c3cc-419b-b81b-65b916b4d0b0 created for application 2d53f031-2325-4b1d-a00e-b05c3fbcfa7d; both participants exchanged 2 messages, applicant marked employer's message read, and unread-for-employer count is now 1 (own outbound message excluded)."
+    },
+    {
+      "step": 7,
+      "name": "Interview created for the application and status updated",
+      "status": "PASS",
+      "evidence": "Interview bf9f6de6-5f02-487c-b1bf-69047ef3f60e created for application 2d53f031-2325-4b1d-a00e-b05c3fbcfa7d (scheduled_start_at=2026-07-24T20:45:50.800Z), visible to the applicant via listForApplicantUser, and status transitioned scheduled → rescheduled."
+    },
+    {
+      "step": 8,
+      "name": "Account settings upsert round-trip",
+      "status": "PASS",
+      "evidence": "getUserSetting/upsertUserSetting round-trip for key \"notify_email\" toggled false → true and persisted both times."
+    },
+    {
+      "step": 9,
+      "name": "Outsider cannot read others saved jobs, conversations, or interviews (RLS)",
+      "status": "PASS",
+      "evidence": "Outsider account cannot read the applicant's saved jobs, the applicant/employer conversation, its messages, or the scheduled interview."
+    },
+    {
+      "step": 10,
+      "name": "Results and evidence written",
+      "status": "PASS",
+      "evidence": "Verification JSON and Markdown evidence were written."
+    }
+  ],
+  "remainingExternalBlockers": []
+}

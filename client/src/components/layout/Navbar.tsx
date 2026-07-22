@@ -1,22 +1,28 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { Container } from '@/components/ui/Container';
 import { Button } from '@/components/ui/Button';
 import { ThemeToggle } from '@/components/layout/ThemeToggle';
 import { LanguageSelector } from '@/components/layout/LanguageSelector';
 import { useAuth } from '@/hooks/useAuth';
+import { useRbac } from '@/hooks/useRbac';
+import { canAccessEmployer } from '@/lib/security';
 import { navLinks } from '@/data/homepage';
 
-function sectionHref(hash: string, pathname: string) {
-  return pathname === '/' ? hash : `/${hash}`;
+function sectionHref(href: string, pathname: string) {
+  if (href.startsWith('/') || href.startsWith('http')) return href;
+  return pathname === '/' ? href : `/${href}`;
 }
 
 export function Navbar() {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const reduceMotion = useReducedMotion();
-  const { isAuthenticated, isEmailVerified, loading, signOut } = useAuth();
+  const { user, isAuthenticated, isEmailVerified, loading, signOut } = useAuth();
+  const { data: rbac } = useRbac(user?.id);
   const location = useLocation();
 
   useEffect(() => {
@@ -34,9 +40,17 @@ export function Navbar() {
   }, [open]);
 
   const showDashboard = !loading && isAuthenticated && isEmailVerified;
+  const showEmployer = showDashboard && canAccessEmployer(user, rbac ?? null);
 
   return (
-    <header
+    <>
+      <a
+        href="#main-content"
+        className="sr-only focus:absolute focus:top-3 focus:left-3 focus:z-[60] focus:inline-flex focus:h-auto focus:w-auto focus:overflow-visible focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-ink focus:shadow focus:ring-2 focus:ring-brand"
+      >
+        {t('app.skipToContent')}
+      </a>
+      <header
       className={`sticky top-0 z-50 border-b transition-[background-color,box-shadow,border-color] ${
         scrolled
           ? 'border-border bg-[var(--nav-bg)] shadow-sm backdrop-blur-xl dark:border-border-dark'
@@ -48,7 +62,7 @@ export function Navbar() {
           to="/"
           className="font-heading text-lg font-bold tracking-tight text-brand sm:text-xl dark:text-brand-light"
         >
-          Global Jobs International
+          {t('app.name')}
         </Link>
 
         <nav className="hidden items-center gap-1 xl:flex" aria-label="Primary">
@@ -58,7 +72,7 @@ export function Navbar() {
               href={sectionHref(link.href, location.pathname)}
               className="rounded-lg px-3 py-2 text-sm font-medium text-ink-muted transition-colors hover:bg-slate-100 hover:text-ink dark:text-ink-muted-dark dark:hover:bg-slate-800 dark:hover:text-ink-dark"
             >
-              {link.label}
+              {t(link.navKey)}
             </a>
           ))}
         </nav>
@@ -69,20 +83,31 @@ export function Navbar() {
           {showDashboard ? (
             <>
               <Button href="/dashboard" variant="ghost" size="sm">
-                Dashboard
+                {t('nav.dashboard')}
               </Button>
+              {showEmployer ? (
+                <Button href="/dashboard/employer" variant="ghost" size="sm">
+                  {t('nav.employer')}
+                </Button>
+              ) : null}
               <Button type="button" variant="secondary" size="sm" onClick={() => void signOut()}>
-                Sign out
+                {t('nav.signOut')}
               </Button>
             </>
           ) : (
             <>
               <Button href="/login" variant="ghost" size="sm">
-                Login
+                {t('nav.login')}
               </Button>
               <Button href="/register" size="sm">
-                Register
+                {t('nav.register')}
               </Button>
+              <Link
+                to="/register/employer"
+                className="hidden text-xs font-medium text-ink-muted hover:text-brand xl:inline dark:text-ink-muted-dark dark:hover:text-brand-light"
+              >
+                {t('auth.registerAsEmployer')}
+              </Link>
             </>
           )}
         </div>
@@ -92,7 +117,7 @@ export function Navbar() {
           className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-white text-ink lg:hidden dark:border-border-dark dark:bg-surface-elevated-dark dark:text-ink-dark"
           aria-expanded={open}
           aria-controls="mobile-nav"
-          aria-label={open ? 'Close menu' : 'Open menu'}
+          aria-label={open ? t('nav.closeMenu') : t('nav.openMenu')}
           onClick={() => setOpen((value) => !value)}
         >
           {open ? (
@@ -136,7 +161,7 @@ export function Navbar() {
                     className="rounded-lg px-3 py-3 text-base font-medium text-ink dark:text-ink-dark"
                     onClick={() => setOpen(false)}
                   >
-                    {link.label}
+                    {t(link.navKey)}
                   </a>
                 ))}
               </nav>
@@ -148,25 +173,39 @@ export function Navbar() {
                 {showDashboard ? (
                   <>
                     <Button href="/dashboard" variant="secondary" onClick={() => setOpen(false)}>
-                      Dashboard
+                      {t('nav.dashboard')}
                     </Button>
+                    {showEmployer ? (
+                      <Button href="/dashboard/employer" onClick={() => setOpen(false)}>
+                        {t('nav.employer')}
+                      </Button>
+                    ) : null}
                     <Button
                       type="button"
+                      variant="ghost"
                       onClick={() => {
                         setOpen(false);
                         void signOut();
                       }}
                     >
-                      Sign out
+                      {t('nav.signOut')}
                     </Button>
                   </>
                 ) : (
                   <>
                     <Button href="/login" variant="secondary" onClick={() => setOpen(false)}>
-                      Login
+                      {t('nav.login')}
                     </Button>
                     <Button href="/register" onClick={() => setOpen(false)}>
-                      Register
+                      {t('nav.register')}
+                    </Button>
+                    <Button
+                      href="/register/employer"
+                      variant="ghost"
+                      className="col-span-2"
+                      onClick={() => setOpen(false)}
+                    >
+                      {t('auth.registerAsEmployer')}
                     </Button>
                   </>
                 )}
@@ -176,5 +215,6 @@ export function Navbar() {
         ) : null}
       </AnimatePresence>
     </header>
+    </>
   );
 }

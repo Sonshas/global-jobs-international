@@ -1,10 +1,13 @@
 import { motion, useReducedMotion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { Container } from '@/components/ui/Container';
 import { SectionHeading } from '@/components/ui/SectionHeading';
 import { Button } from '@/components/ui/Button';
 import { featuredCountries } from '@/data/homepage';
+import { countrySlug } from '@/data/country-pages';
 
 export function FeaturedCountries() {
+  const { t } = useTranslation();
   const reduceMotion = useReducedMotion();
 
   return (
@@ -16,9 +19,9 @@ export function FeaturedCountries() {
       <Container>
         <SectionHeading
           id="countries-heading"
-          eyebrow="Destinations"
-          title="Featured countries"
-          description="Explore high-demand hiring markets with verified international openings."
+          eyebrow={t('home.destinations')}
+          title={t('home.featuredCountries')}
+          description={t('home.featuredCountriesDesc')}
         />
 
         <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
@@ -30,7 +33,7 @@ export function FeaturedCountries() {
               viewport={{ once: true, margin: '-40px' }}
               transition={{ duration: 0.45, delay: index * 0.05 }}
               whileHover={reduceMotion ? undefined : { y: -6 }}
-              className="group overflow-hidden rounded-3xl border border-border bg-[var(--bg)] shadow-sm transition-shadow hover:shadow-lg dark:border-border-dark"
+              className="group overflow-hidden rounded-3xl border border-border/70 bg-white/80 shadow-sm backdrop-blur-xl transition-shadow hover:shadow-lg dark:border-border-dark dark:bg-slate-900/50"
             >
               <div className="relative aspect-[16/10] overflow-hidden">
                 <img
@@ -48,8 +51,9 @@ export function FeaturedCountries() {
                     width={20}
                     height={14}
                     alt=""
-                    className="rounded-[2px]"
                     loading="lazy"
+                    decoding="async"
+                    className="rounded-[2px]"
                   />
                   <span className="text-xs font-semibold text-ink dark:text-ink-dark">
                     {country.name}
@@ -57,7 +61,7 @@ export function FeaturedCountries() {
                 </div>
                 {country.visaSponsorship ? (
                   <span className="absolute top-3 right-3 rounded-full bg-accent px-2.5 py-1 text-[11px] font-bold tracking-wide text-ink uppercase">
-                    Visa sponsorship
+                    {t('home.visaSponsorship')}
                   </span>
                 ) : null}
               </div>
@@ -66,7 +70,7 @@ export function FeaturedCountries() {
                 <div className="flex items-end justify-between gap-3">
                   <div>
                     <p className="text-xs font-semibold tracking-wide text-ink-muted uppercase dark:text-ink-muted-dark">
-                      Open roles
+                      {t('home.openRoles')}
                     </p>
                     <p className="font-heading text-2xl font-bold text-brand dark:text-brand-light">
                       {country.openings.toLocaleString()}
@@ -74,7 +78,7 @@ export function FeaturedCountries() {
                   </div>
                   <div className="text-right">
                     <p className="text-xs font-semibold tracking-wide text-ink-muted uppercase dark:text-ink-muted-dark">
-                      Avg. salary
+                      {t('home.avgSalary')}
                     </p>
                     <p className="text-sm font-semibold text-ink dark:text-ink-dark">
                       {country.averageSalary}
@@ -82,8 +86,8 @@ export function FeaturedCountries() {
                   </div>
                 </div>
 
-                <Button href="#jobs" variant="outline" className="w-full rounded-2xl">
-                  View Jobs
+                <Button href={`/countries/${countrySlug(country.name)}`} variant="outline" className="w-full rounded-2xl">
+                  {t('home.viewCountry')}
                 </Button>
               </div>
             </motion.article>

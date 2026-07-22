@@ -1,56 +1,117 @@
+import {
+  getFeaturedJobs,
+  getJobsByCountry,
+  jobCatalogStats,
+  MANDATORY_JOB_TITLES,
+  searchCategories,
+  searchCountryNames,
+  searchExperienceLevels,
+  searchJobTitles,
+  type JobListing,
+} from '@/data/jobs-catalog';
+import { allowSampleCatalog } from '@/lib/sample-catalog';
+
+/** Navigation items — labels come from i18n keys via `navKey`. */
 export const navLinks = [
-  { label: 'Home', href: '#home' },
-  { label: 'Jobs', href: '#jobs' },
-  { label: 'Countries', href: '#countries' },
-  { label: 'Employers', href: '#employers' },
-  { label: 'Services', href: '#services' },
-  { label: 'About', href: '#about' },
-  { label: 'Contact', href: '#contact' },
+  { navKey: 'nav.home', href: '#home' },
+  { navKey: 'nav.jobs', href: '/jobs' },
+  { navKey: 'nav.countries', href: '/countries' },
+  { navKey: 'nav.services', href: '/services' },
+  { navKey: 'nav.employers', href: '#verified-employers' },
+  { navKey: 'nav.about', href: '/legal/about' },
+  { navKey: 'nav.contact', href: '#contact' },
 ] as const;
 
-export const languages = [
-  { code: 'en', label: 'English' },
-  { code: 'es', label: 'Español' },
-  { code: 'fr', label: 'Français' },
-  { code: 'de', label: 'Deutsch' },
-  { code: 'ar', label: 'العربية' },
-] as const;
+/** @deprecated Use appLanguages from `@/i18n/languages` */
+export { appLanguages as languages } from '@/i18n/languages';
 
+export {
+  getJobsByCountry,
+  MANDATORY_JOB_TITLES,
+  searchCategories,
+  searchCountryNames,
+  searchExperienceLevels,
+  searchJobTitles,
+};
+export type { JobListing };
+
+export const sampleJobTitles = MANDATORY_JOB_TITLES;
+export type SampleJobTitle = (typeof MANDATORY_JOB_TITLES)[number];
+
+/**
+ * Fallback stat values shown until live data loads (see `usePlatformPublicStats`
+ * in `useJobsQueries`/`usePublicStatsQueries`). Sample catalog counts are only
+ * used as placeholders when the sample catalog is explicitly allowed
+ * (`allowSampleCatalog()`); production builds start from conservative zeros
+ * and are immediately overridden by live DB-backed counts in `StatsSection`.
+ */
 export const stats = [
-  { id: 'applicants', label: 'Applicants', value: 25000, suffix: '+' },
-  { id: 'employers', label: 'Employers', value: 650, suffix: '+' },
-  { id: 'countries', label: 'Countries', value: 17, suffix: '' },
-  { id: 'jobs', label: 'Jobs', value: 7500, suffix: '+' },
+  {
+    id: 'jobs',
+    label: 'Available Jobs',
+    value: allowSampleCatalog() ? jobCatalogStats.openJobs : 0,
+    suffix: '+',
+    format: 'standard' as const,
+  },
+  {
+    id: 'countries',
+    label: 'Countries',
+    value: allowSampleCatalog() ? jobCatalogStats.totalCountries : 0,
+    suffix: '+',
+    format: 'standard' as const,
+  },
+  {
+    id: 'employers',
+    label: 'Verified Employers',
+    value: allowSampleCatalog() ? jobCatalogStats.totalEmployers : 0,
+    suffix: '+',
+    format: 'standard' as const,
+  },
+  {
+    id: 'applicants',
+    label: 'Applicants',
+    value: allowSampleCatalog() ? jobCatalogStats.applicants : 0,
+    suffix: '',
+    format: 'compact' as const,
+  },
+  {
+    id: 'interviews',
+    label: 'Interviews Scheduled',
+    value: allowSampleCatalog() ? jobCatalogStats.interviewsScheduled : 0,
+    suffix: '+',
+    format: 'standard' as const,
+  },
+  {
+    id: 'placements',
+    label: 'Successful Placements',
+    value: allowSampleCatalog() ? jobCatalogStats.successfulPlacements : 0,
+    suffix: '',
+    format: 'compact' as const,
+  },
 ] as const;
 
-export const jobCategories = [
-  'Healthcare',
-  'Engineering',
-  'Hospitality',
-  'IT & Software',
-  'Construction',
-  'Logistics',
-  'Education',
-  'Finance',
-] as const;
+export const jobCategories = searchCategories;
 
-export const searchCountries = [
-  'Canada',
-  'Australia',
-  'United Kingdom',
-  'Germany',
-  'Ireland',
-  'Qatar',
-  'United Arab Emirates',
-  'Saudi Arabia',
-] as const;
+export const searchCountries = searchCountryNames;
 
 export const featuredCountries = [
   {
+    name: 'United States',
+    code: 'us',
+    openings: getJobsByCountry('United States').length,
+    averageSalary: 'USD 4,200 / mo',
+    currency: 'USD',
+    visaSponsorship: true,
+    image:
+      'https://images.unsplash.com/photo-1485738422979-f5c462d49f74?auto=format&fit=crop&w=800&q=70',
+    imageAlt: 'New York City skyline',
+  },
+  {
     name: 'Canada',
     code: 'ca',
-    openings: 1840,
-    averageSalary: 'CAD 72,000',
+    openings: getJobsByCountry('Canada').length,
+    averageSalary: 'CAD 3,800 / mo',
+    currency: 'CAD',
     visaSponsorship: true,
     image:
       'https://images.unsplash.com/photo-1519834785169-98be25ec3f84?auto=format&fit=crop&w=800&q=70',
@@ -59,8 +120,9 @@ export const featuredCountries = [
   {
     name: 'Australia',
     code: 'au',
-    openings: 1520,
-    averageSalary: 'AUD 95,000',
+    openings: getJobsByCountry('Australia').length,
+    averageSalary: 'AUD 4,500 / mo',
+    currency: 'AUD',
     visaSponsorship: true,
     image:
       'https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?auto=format&fit=crop&w=800&q=70',
@@ -69,8 +131,9 @@ export const featuredCountries = [
   {
     name: 'United Kingdom',
     code: 'gb',
-    openings: 1680,
-    averageSalary: 'GBP 48,000',
+    openings: getJobsByCountry('United Kingdom').length,
+    averageSalary: 'GBP 2,900 / mo',
+    currency: 'GBP',
     visaSponsorship: true,
     image:
       'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=800&q=70',
@@ -79,8 +142,9 @@ export const featuredCountries = [
   {
     name: 'Germany',
     code: 'de',
-    openings: 1410,
-    averageSalary: 'EUR 58,000',
+    openings: getJobsByCountry('Germany').length,
+    averageSalary: 'EUR 3,400 / mo',
+    currency: 'EUR',
     visaSponsorship: true,
     image:
       'https://images.unsplash.com/photo-1467269204594-9661b134dd2b?auto=format&fit=crop&w=800&q=70',
@@ -89,8 +153,9 @@ export const featuredCountries = [
   {
     name: 'Ireland',
     code: 'ie',
-    openings: 980,
-    averageSalary: 'EUR 62,000',
+    openings: getJobsByCountry('Ireland').length,
+    averageSalary: 'EUR 3,500 / mo',
+    currency: 'EUR',
     visaSponsorship: true,
     image:
       'https://images.unsplash.com/photo-1564953263297-0fe329af7105?auto=format&fit=crop&w=800&q=70',
@@ -99,8 +164,9 @@ export const featuredCountries = [
   {
     name: 'Qatar',
     code: 'qa',
-    openings: 760,
-    averageSalary: 'QAR 18,000 / mo',
+    openings: getJobsByCountry('Qatar').length,
+    averageSalary: 'QAR 8,500 / mo',
+    currency: 'QAR',
     visaSponsorship: true,
     image:
       'https://images.unsplash.com/photo-1559599746-8823b38544c6?auto=format&fit=crop&w=800&q=70',
@@ -109,87 +175,24 @@ export const featuredCountries = [
   {
     name: 'United Arab Emirates',
     code: 'ae',
-    openings: 1290,
-    averageSalary: 'AED 16,500 / mo',
+    openings: getJobsByCountry('United Arab Emirates').length,
+    averageSalary: 'AED 9,200 / mo',
+    currency: 'AED',
     visaSponsorship: true,
     image:
       'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=800&q=70',
     imageAlt: 'Dubai skyline with Burj Khalifa',
   },
-  {
-    name: 'Saudi Arabia',
-    code: 'sa',
-    openings: 1120,
-    averageSalary: 'SAR 14,000 / mo',
-    visaSponsorship: true,
-    image:
-      'https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa?auto=format&fit=crop&w=800&q=70',
-    imageAlt: 'Riyadh modern skyline',
-  },
 ] as const;
 
-export const featuredJobs = [
-  {
-    id: '1',
-    title: 'Registered Nurse',
-    company: 'Maple Health Network',
-    logo: 'MH',
-    logoColor: '#0052CC',
-    country: 'Canada',
-    salary: 'CAD 78,000 – 95,000',
-    type: 'Full-time',
-  },
-  {
-    id: '2',
-    title: 'Civil Engineer',
-    company: 'Pacific Infrastructure',
-    logo: 'PI',
-    logoColor: '#0F766E',
-    country: 'Australia',
-    salary: 'AUD 110,000 – 135,000',
-    type: 'Full-time',
-  },
-  {
-    id: '3',
-    title: 'Software Engineer',
-    company: 'Thames Digital',
-    logo: 'TD',
-    logoColor: '#7C3AED',
-    country: 'United Kingdom',
-    salary: 'GBP 55,000 – 75,000',
-    type: 'Full-time',
-  },
-  {
-    id: '4',
-    title: 'Hotel Operations Manager',
-    company: 'Gulf Hospitality Group',
-    logo: 'GH',
-    logoColor: '#B45309',
-    country: 'United Arab Emirates',
-    salary: 'AED 18,000 – 24,000 / mo',
-    type: 'Full-time',
-  },
-  {
-    id: '5',
-    title: 'Warehouse Supervisor',
-    company: 'Rhein Logistics',
-    logo: 'RL',
-    logoColor: '#DC2626',
-    country: 'Germany',
-    salary: 'EUR 42,000 – 52,000',
-    type: 'Full-time',
-  },
-  {
-    id: '6',
-    title: 'Project Site Manager',
-    company: 'Desert Build Co.',
-    logo: 'DB',
-    logoColor: '#0369A1',
-    country: 'Qatar',
-    salary: 'QAR 16,000 – 22,000 / mo',
-    type: 'Contract',
-  },
-] as const;
+export type FeaturedCountry = (typeof featuredCountries)[number];
+
+/** @deprecated Use JobListing from jobs-catalog — kept for compatibility. */
+export type CountryJob = JobListing;
+
+export const countryJobs = getJobsByCountry(null);
+export const featuredJobs = getFeaturedJobs(9);
+export const getJobsForCountry = getJobsByCountry;
 
 export const whyChooseUs = [
   {
@@ -279,7 +282,7 @@ export const testimonials = [
     rating: 5,
     photo: 'https://i.pravatar.cc/160?img=47',
     quote:
-      'Global Jobs International made my move to Toronto seamless. The advisors were responsive and honest every step of the way.',
+      'Global Jobs International helped me secure a job abroad. The advisors were responsive and honest every step of the way.',
   },
   {
     id: '2',
@@ -303,13 +306,102 @@ export const testimonials = [
   },
 ] as const;
 
+export const verifiedEmployers = [
+  {
+    id: 'maple',
+    name: 'Maple Health Network',
+    industry: 'Healthcare',
+    country: 'Canada',
+    logo: 'MH',
+    logoColor: '#0052CC',
+    openings: 86,
+  },
+  {
+    id: 'pacific',
+    name: 'Pacific Infrastructure',
+    industry: 'Engineering',
+    country: 'Australia',
+    logo: 'PI',
+    logoColor: '#0F766E',
+    openings: 42,
+  },
+  {
+    id: 'thames',
+    name: 'Thames Digital',
+    industry: 'Technology',
+    country: 'United Kingdom',
+    logo: 'TD',
+    logoColor: '#1D4ED8',
+    openings: 31,
+  },
+  {
+    id: 'gulf',
+    name: 'Gulf Hospitality Group',
+    industry: 'Hospitality',
+    country: 'United Arab Emirates',
+    logo: 'GH',
+    logoColor: '#B45309',
+    openings: 58,
+  },
+  {
+    id: 'rhein',
+    name: 'Rhein Logistics',
+    industry: 'Logistics',
+    country: 'Germany',
+    logo: 'RL',
+    logoColor: '#DC2626',
+    openings: 37,
+  },
+  {
+    id: 'desert',
+    name: 'Desert Build Co.',
+    industry: 'Construction',
+    country: 'Qatar',
+    logo: 'DB',
+    logoColor: '#0369A1',
+    openings: 29,
+  },
+  {
+    id: 'emerald',
+    name: 'Emerald Care Partners',
+    industry: 'Care Services',
+    country: 'Ireland',
+    logo: 'EC',
+    logoColor: '#047857',
+    openings: 44,
+  },
+  {
+    id: 'najd',
+    name: 'Najd Industrial Group',
+    industry: 'Manufacturing',
+    country: 'Saudi Arabia',
+    logo: 'NI',
+    logoColor: '#0F172A',
+    openings: 63,
+  },
+] as const;
+
+/**
+ * Current application season windows.
+ * Update these dates each cycle — countdown derives from them live.
+ */
+export const applicationSeason = {
+  name: '2026 International Placement Season',
+  opensAt: '2026-07-21T00:00:00+03:00',
+  closesAt: '2026-09-30T23:59:59+03:00',
+  visaProcessing: 'October 2026',
+  departure: 'November–December 2026',
+  description:
+    'Submit applications for verified overseas roles during the official placement window. Early applicants receive priority document review.',
+} as const;
+
 export const footerColumns = [
   {
     title: 'Explore',
     links: [
       { label: 'Find Jobs', href: '#jobs' },
       { label: 'Countries', href: '#countries' },
-      { label: 'Employers', href: '#employers' },
+      { label: 'Employers', href: '#verified-employers' },
       { label: 'Services', href: '#services' },
     ],
   },
@@ -344,40 +436,45 @@ export const footerColumns = [
 
 /** Approximate map coordinates in a 1000×500 viewBox */
 export const mapLocations = [
+  { id: 'us', label: 'United States', x: 210, y: 175 },
   { id: 'ca', label: 'Canada', x: 220, y: 148 },
   { id: 'gb', label: 'United Kingdom', x: 478, y: 142 },
   { id: 'ie', label: 'Ireland', x: 452, y: 148 },
   { id: 'de', label: 'Germany', x: 512, y: 156 },
   { id: 'qa', label: 'Qatar', x: 618, y: 236 },
   { id: 'ae', label: 'UAE', x: 638, y: 250 },
-  { id: 'sa', label: 'Saudi Arabia', x: 598, y: 248 },
   { id: 'au', label: 'Australia', x: 820, y: 372 },
 ] as const;
 
 export const flightRoutes = [
   {
+    id: 'us-ca',
+    d: 'M210 175 C 214 160, 218 152, 220 148',
+    delay: 0,
+  },
+  {
     id: 'ca-gb',
     d: 'M220 148 C 320 80, 400 90, 478 142',
-    delay: 0,
+    delay: 0.3,
   },
   {
     id: 'gb-de',
     d: 'M478 142 C 492 146, 502 150, 512 156',
-    delay: 0.4,
+    delay: 0.7,
   },
   {
     id: 'de-ae',
     d: 'M512 156 C 560 190, 600 220, 638 250',
-    delay: 0.9,
+    delay: 1.1,
   },
   {
     id: 'ae-au',
     d: 'M638 250 C 700 290, 760 330, 820 372',
-    delay: 1.4,
+    delay: 1.5,
   },
   {
-    id: 'ca-au',
-    d: 'M220 148 C 420 220, 640 300, 820 372',
+    id: 'us-au',
+    d: 'M210 175 C 420 240, 640 310, 820 372',
     delay: 1.9,
   },
   {

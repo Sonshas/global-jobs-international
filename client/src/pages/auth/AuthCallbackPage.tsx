@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { AuthLayout } from '@/components/auth/AuthLayout';
 import { AuthCard } from '@/components/auth/AuthCard';
 import { FormAlert } from '@/components/auth/FormFields';
@@ -8,6 +9,7 @@ import { getAuthErrorMessage } from '@/lib/auth-errors';
 import { supabase } from '@/lib/supabase';
 
 export function AuthCallbackPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
 
@@ -32,7 +34,7 @@ export function AuthCallbackPage() {
           const { data, error: sessionError } = await supabase.auth.getSession();
           if (sessionError) throw sessionError;
           if (!data.session) {
-            throw new Error('No authentication session found. The link may have expired.');
+            throw new Error(t('auth.sessionExpired'));
           }
         }
 
@@ -49,24 +51,21 @@ export function AuthCallbackPage() {
     return () => {
       active = false;
     };
-  }, [navigate]);
+  }, [navigate, t]);
 
   return (
-    <AuthLayout
-      title="Confirming your email"
-      subtitle="Please wait while we securely finish signing you in."
-    >
+    <AuthLayout title={t('auth.callbackTitle')} subtitle={t('auth.callbackSubtitle')}>
       <AuthCard>
         {error ? (
           <div className="space-y-4">
             <FormAlert>{error}</FormAlert>
             <Button href="/login" className="w-full rounded-2xl">
-              Go to sign in
+              {t('auth.goToSignIn')}
             </Button>
           </div>
         ) : (
           <p className="text-center text-sm text-ink-muted dark:text-ink-muted-dark">
-            Completing verification…
+            {t('auth.completingVerification')}
           </p>
         )}
       </AuthCard>

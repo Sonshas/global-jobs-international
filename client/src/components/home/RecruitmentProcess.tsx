@@ -1,9 +1,11 @@
+import { useTranslation } from 'react-i18next';
 import { motion, useReducedMotion } from 'framer-motion';
 import { Container } from '@/components/ui/Container';
 import { SectionHeading } from '@/components/ui/SectionHeading';
 import { recruitmentSteps } from '@/data/homepage';
 
 export function RecruitmentProcess() {
+  const { t } = useTranslation();
   const reduceMotion = useReducedMotion();
 
   return (
@@ -15,9 +17,9 @@ export function RecruitmentProcess() {
       <Container>
         <SectionHeading
           id="process-heading"
-          eyebrow="Recruitment Journey"
-          title="Your path from application to arrival"
-          description="A clear nine-step timeline designed for international candidates."
+          eyebrow={t('home.processBlock.eyebrow')}
+          title={t('home.processBlock.title')}
+          description={t('home.processBlock.description')}
         />
 
         <div className="relative">
@@ -41,10 +43,12 @@ export function RecruitmentProcess() {
                     {step.step}
                   </span>
                   <h3 className="font-heading text-sm font-semibold text-ink dark:text-ink-dark">
-                    {step.title}
+                    {t(`home.processBlock.steps.${step.step}.title`, { defaultValue: step.title })}
                   </h3>
                   <p className="mt-2 text-xs leading-relaxed text-ink-muted dark:text-ink-muted-dark">
-                    {step.description}
+                    {t(`home.processBlock.steps.${step.step}.description`, {
+                      defaultValue: step.description,
+                    })}
                   </p>
                 </div>
               </motion.li>
