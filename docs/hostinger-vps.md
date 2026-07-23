@@ -55,12 +55,24 @@ Before the client build, create a local, uncommitted `client/.env.production`:
 
 ```dotenv
 VITE_APP_ENV=production
-VITE_API_URL=https://example.com/api
+VITE_API_URL=/api
+VITE_PUBLIC_SITE_URL=https://globaljobsinternational.com
 VITE_SUPABASE_URL=https://<project-ref>.supabase.co
 VITE_SUPABASE_ANON_KEY=<anon-key>
 VITE_STRICT_RBAC=true
 VITE_ALLOW_DEMO_ADMIN=false
 ```
+
+On the VPS, `server/.env` must use real HTTPS origins (never localhost):
+
+```dotenv
+CLIENT_ORIGIN=https://globaljobsinternational.com,https://www.globaljobsinternational.com
+PUBLIC_APP_URL=https://globaljobsinternational.com
+HOST=127.0.0.1
+APP_ENV=production
+```
+
+After deploy, run `node scripts/verify-production-deploy.mjs` or rebuild on the VPS with `./scripts/vps-production-rebuild.sh`.
 
 ## 4. Build and deploy
 

@@ -933,7 +933,10 @@
     "interviewAtLabel": "Interview date & time",
     "meetingUrlLabel": "Meeting URL (optional)",
     "campaignStartsAt": "Campaign start date & time",
-    "campaignEndsAt": "Campaign end date & time"
+    "campaignEndsAt": "Campaign end date & time",
+    "cannotDeleteSelf": "You cannot delete your own account from this screen.",
+    "deleteUserConfirm": "Permanently delete {{email}}? This removes their auth account and related records and cannot be undone.",
+    "deleteUserFailed": "Failed to delete user."
   },
   "footer": {
     "tagline": "प्रीमियम अंतर्राष्ट्रीय भर्ती आवेदकों को दुनिया भर में सत्यापित नियोक्ताओं से जोड़ती है - एक ही वर्कफ़्लो में आवेदन, दस्तावेज़, वीज़ा और यात्रा।",

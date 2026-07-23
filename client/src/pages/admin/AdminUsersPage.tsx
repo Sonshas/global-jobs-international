@@ -3,13 +3,15 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { DashboardShell } from '@/components/dashboard/DashboardShell';
 import { Button } from '@/components/ui/Button';
-import { assignUserRole, listAllUsers, setUserStatus } from '@/repositories/admin-users.repository';
+import { assignUserRole, deleteUserAccount, listAllUsers, setUserStatus } from '@/repositories/admin-users.repository';
 import { logAudit } from '@/lib/security';
+import { useAuth } from '@/hooks/useAuth';
 
 const ROLE_OPTIONS = ['applicant', 'employer', 'advisor', 'admin', 'super_admin'] as const;
 
 export function AdminUsersPage() {
   const { t } = useTranslation();
+  const { user } = useAuth();
   const queryClient = useQueryClient();
   const { data: users = [], isLoading } = useQuery({
     queryKey: ['admin', 'users'],
@@ -48,6 +50,27 @@ export function AdminUsersPage() {
     }
   };
 
+  const onDeleteUser = async (userId: string, email: string) => {
+    if (userId === user?.id) {
+      setError(t('admin.cannotDeleteSelf'));
+      return;
+    }
+    const confirmed = window.confirm(t('admin.deleteUserConfirm', { email }));
+    if (!confirmed) return;
+
+    setError(null);
+    setBusyId(userId);
+    try {
+      await deleteUserAccount(userId);
+      logAudit({ action: 'delete_user', detail: `${userId} (${email})` });
+      refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t('admin.deleteUserFailed'));
+    } finally {
+      setBusyId(null);
+    }
+  };
+
   return (
     <DashboardShell title={t('admin.usersTitle')} adminLink>
       <h1 className="font-heading text-3xl font-bold text-ink dark:text-ink-dark">{t('admin.usersTitle')}</h1>
@@ -70,21 +93,21 @@ export function AdminUsersPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-border/60 dark:divide-border-dark">
-              {users.map((user) => (
-                <tr key={user.id}>
-                  <td className="px-4 py-3">{user.email}</td>
-                  <td className="px-4 py-3">{user.fullName || '—'}</td>
-                  <td className="px-4 py-3 capitalize">{user.accountType}</td>
-                  <td className="px-4 py-3 capitalize">{user.status}</td>
-                  <td className="px-4 py-3">{user.roles.join(', ') || '—'}</td>
+              {users.map((row) => (
+                <tr key={row.id}>
+                  <td className="px-4 py-3">{row.email}</td>
+                  <td className="px-4 py-3">{row.fullName || '—'}</td>
+                  <td className="px-4 py-3 capitalize">{row.accountType}</td>
+                  <td className="px-4 py-3 capitalize">{row.status}</td>
+                  <td className="px-4 py-3">{row.roles.join(', ') || '—'}</td>
                   <td className="px-4 py-3">
                     <div className="flex flex-wrap items-center gap-2">
                       <select
                         className="h-8 rounded-lg border border-border bg-[var(--bg)] px-2 text-xs dark:border-border-dark"
-                        disabled={busyId === user.id}
+                        disabled={busyId === row.id}
                         defaultValue=""
                         onChange={(e) => {
-                          if (e.target.value) void onAssignRole(user.id, e.target.value);
+                          if (e.target.value) void onAssignRole(row.id, e.target.value);
                           e.target.value = '';
                         }}
                       >
@@ -95,13 +118,13 @@ export function AdminUsersPage() {
                           </option>
                         ))}
                       </select>
-                      {user.status === 'suspended' ? (
+                      {row.status === 'suspended' ? (
                         <Button
                           type="button"
                           size="sm"
                           variant="outline"
-                          disabled={busyId === user.id}
-                          onClick={() => void onSetStatus(user.id, 'active')}
+                          disabled={busyId === row.id}
+                          onClick={() => void onSetStatus(row.id, 'active')}
                         >
                           {t('admin.reactivate')}
                         </Button>
@@ -110,12 +133,21 @@ export function AdminUsersPage() {
                           type="button"
                           size="sm"
                           variant="secondary"
-                          disabled={busyId === user.id}
-                          onClick={() => void onSetStatus(user.id, 'suspended')}
+                          disabled={busyId === row.id}
+                          onClick={() => void onSetStatus(row.id, 'suspended')}
                         >
                           {t('admin.suspend')}
                         </Button>
                       )}
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="secondary"
+                        disabled={busyId === row.id || row.id === user?.id}
+                        onClick={() => void onDeleteUser(row.id, row.email)}
+                      >
+                        {t('common.delete')}
+                      </Button>
                     </div>
                   </td>
                 </tr>

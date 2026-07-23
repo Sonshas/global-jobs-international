@@ -933,7 +933,10 @@
     "interviewAtLabel": "Interview date & time",
     "meetingUrlLabel": "Meeting URL (optional)",
     "campaignStartsAt": "Campaign start date & time",
-    "campaignEndsAt": "Campaign end date & time"
+    "campaignEndsAt": "Campaign end date & time",
+    "cannotDeleteSelf": "You cannot delete your own account from this screen.",
+    "deleteUserConfirm": "Permanently delete {{email}}? This removes their auth account and related records and cannot be undone.",
+    "deleteUserFailed": "Failed to delete user."
   },
   "footer": {
     "tagline": "Премиальный международный подбор персонала, соединяющий кандидатов с проверенными работодателями по всему миру — заявки, документы, визы и поездки в одном рабочем процессе.",

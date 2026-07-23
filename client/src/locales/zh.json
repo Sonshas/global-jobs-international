@@ -933,7 +933,10 @@
     "interviewAtLabel": "Interview date & time",
     "meetingUrlLabel": "Meeting URL (optional)",
     "campaignStartsAt": "Campaign start date & time",
-    "campaignEndsAt": "Campaign end date & time"
+    "campaignEndsAt": "Campaign end date & time",
+    "cannotDeleteSelf": "You cannot delete your own account from this screen.",
+    "deleteUserConfirm": "Permanently delete {{email}}? This removes their auth account and related records and cannot be undone.",
+    "deleteUserFailed": "Failed to delete user."
   },
   "footer": {
     "tagline": "优质的国际招聘将申请人与世界各地经过验证的雇主联系起来——申请、文件、签证和旅行在一个工作流程中完成。",

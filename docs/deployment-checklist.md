@@ -26,13 +26,14 @@ Confirm every required variable exists in the target environment (see `.env.exam
 NODE_ENV=production
 APP_ENV=production
 PORT=3001
-CLIENT_ORIGIN=https://<your-domain>
-PUBLIC_APP_URL=https://<your-domain>
+HOST=127.0.0.1
+CLIENT_ORIGIN=https://globaljobsinternational.com,https://www.globaljobsinternational.com
+PUBLIC_APP_URL=https://globaljobsinternational.com
 SUPABASE_URL=https://<project-ref>.supabase.co
 SUPABASE_ANON_KEY=<anon-key>
 SUPABASE_SERVICE_ROLE_KEY=<service-role-key>
 RESEND_API_KEY=<resend-api-key>
-EMAIL_FROM=Global Jobs International <noreply@<your-domain>>
+EMAIL_FROM=Global Jobs International <noreply@globaljobsinternational.com>
 STRIPE_SECRET_KEY=sk_live_...
 STRIPE_WEBHOOK_SECRET=whsec_...
 CRON_SECRET=<random-long-secret>      # required to run interview-reminders unattended
@@ -42,7 +43,8 @@ CRON_SECRET=<random-long-secret>      # required to run interview-reminders unat
 
 ```dotenv
 VITE_APP_ENV=production
-VITE_API_URL=https://<your-domain>/api
+VITE_API_URL=/api
+VITE_PUBLIC_SITE_URL=https://globaljobsinternational.com
 VITE_SUPABASE_URL=https://<project-ref>.supabase.co
 VITE_SUPABASE_ANON_KEY=<anon-key>
 VITE_STRICT_RBAC=true
@@ -52,6 +54,13 @@ VITE_ALLOW_DEMO_ADMIN=false
 ```
 
 Never place `SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY`, `STRIPE_SECRET_KEY`, or `STRIPE_WEBHOOK_SECRET` in any `VITE_*` variable or client file.
+
+**White-page warning:** Vite inlines `VITE_*` at build time. If you build on the VPS after `rsync` (which excludes `.env*`), or without `client/.env.production`, the SPA throws on boot and shows a blank page. Always create `client/.env.production` on the build machine **or** the VPS, run `npm run build`, then serve `client/dist`.
+
+**CORS warning:** `CLIENT_ORIGIN` must be the real HTTPS site (not `http://localhost:5173`). Comma-separate apex + www if both are used.
+
+On-VPS rebuild helper: `chmod +x scripts/vps-production-rebuild.sh && ./scripts/vps-production-rebuild.sh`  
+Post-deploy checks: `npm run verify:production`
 
 Run `node scripts/validate-environment.mjs` against the target `.env` files before deploying.
 
@@ -101,13 +110,18 @@ Subsequent deploys: the deploy script reloads PM2 automatically (`pm2 reload`), 
 
 ```bash
 sudo cp deploy/nginx.conf.example /etc/nginx/sites-available/global-jobs-international
-sudo ln -s /etc/nginx/sites-available/global-jobs-international /etc/nginx/sites-enabled/
+# Edit server_name / root if needed, then:
+sudo ln -sf /etc/nginx/sites-available/global-jobs-international /etc/nginx/sites-enabled/
 sudo rm -f /etc/nginx/sites-enabled/default
 sudo nginx -t && sudo systemctl reload nginx
-sudo certbot --nginx -d <your-domain> -d www.<your-domain>
+sudo certbot --nginx -d globaljobsinternational.com -d www.globaljobsinternational.com
 ```
 
-Replace the example domain/path before enabling. Enable HSTS in the Nginx config only after confirming every subdomain is HTTPS-only.
+**Nginx `proxy_pass` must not end with `/`.** Use `proxy_pass http://127.0.0.1:3001;` so `/api/health` reaches Express as `/api/health`. A trailing slash strips `/api` and previously returned Express 404 JSON.
+
+`root` must be `/var/www/global-jobs-international/client/dist` (Vite build output), not the repo root or `client/src`.
+
+Enable HSTS in the Nginx config only after confirming every subdomain is HTTPS-only.
 
 ## 6. Stripe webhook
 

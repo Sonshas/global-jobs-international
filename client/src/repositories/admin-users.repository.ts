@@ -72,3 +72,21 @@ export async function assignUserRole(userId: string, roleSlug: string): Promise<
     throw new Error(body?.error ?? 'Unable to assign role.');
   }
 }
+
+/** Permanently deletes auth + public user via server (service role). */
+export async function deleteUserAccount(userId: string): Promise<void> {
+  const apiBase = (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\/$/, '');
+  if (!apiBase) throw new Error('VITE_API_URL is required to delete users.');
+  const { data } = await supabase.auth.getSession();
+  const token = data.session?.access_token;
+  if (!token) throw new Error('Sign in is required.');
+
+  const response = await fetch(`${apiBase}/admin/users/${userId}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!response.ok) {
+    const body = await response.json().catch(() => null);
+    throw new Error(body?.error ?? 'Failed to delete user.');
+  }
+}

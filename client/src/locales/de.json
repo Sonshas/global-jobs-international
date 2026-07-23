@@ -933,7 +933,10 @@
     "interviewAtLabel": "Interview date & time",
     "meetingUrlLabel": "Meeting URL (optional)",
     "campaignStartsAt": "Campaign start date & time",
-    "campaignEndsAt": "Campaign end date & time"
+    "campaignEndsAt": "Campaign end date & time",
+    "cannotDeleteSelf": "You cannot delete your own account from this screen.",
+    "deleteUserConfirm": "Permanently delete {{email}}? This removes their auth account and related records and cannot be undone.",
+    "deleteUserFailed": "Failed to delete user."
   },
   "footer": {
     "tagline": "Internationale Premium-Rekrutierung verbindet Bewerber mit geprüften Arbeitgebern auf der ganzen Welt – Bewerbungen, Dokumente, Visa und Reisen in einem Arbeitsablauf.",

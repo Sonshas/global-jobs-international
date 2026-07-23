@@ -31,6 +31,9 @@ auditRouter.get('/', requireAuth, requireAdmin, async (req: AuthenticatedRequest
 const ACTION_MAP: Record<string, 'create' | 'update' | 'delete' | 'login' | 'logout' | 'status_change' | 'upload' | 'payment' | 'message' | 'other'> = {
   employer_status: 'status_change',
   job_status: 'status_change',
+  user_status: 'status_change',
+  assign_user_role: 'update',
+  delete_user: 'delete',
   payment: 'payment',
   upload: 'upload',
   login: 'login',

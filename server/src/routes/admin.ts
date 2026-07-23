@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { requireAuth, type AuthenticatedRequest } from '../middleware/requireAuth.js';
 import { requireAdmin } from '../middleware/requireAdmin.js';
 import { getSupabaseUserClient, tryGetSupabaseAdmin } from '../lib/supabase.js';
+import { purgeUserAccount } from '../lib/userDeletion.js';
 
 export const adminRouter = Router();
 
@@ -91,5 +92,40 @@ adminRouter.post('/users/:userId/role', requireAuth, requireAdmin, async (req: A
     return res.json({ ok: true, userRoleId: userRole.id, via: 'admin_jwt' });
   } catch (err) {
     return res.status(500).json({ error: err instanceof Error ? err.message : 'Unable to assign role.' });
+  }
+});
+
+/**
+ * DELETE /api/admin/users/:userId — permanently deletes a user.
+ * Order: Storage API file cleanup → public.users (cascades) → auth.users.
+ * Requires service role. Never deletes from storage.objects via SQL.
+ */
+adminRouter.delete('/users/:userId', requireAuth, requireAdmin, async (req: AuthenticatedRequest, res) => {
+  const rawId = req.params.userId;
+  const targetUserId = Array.isArray(rawId) ? rawId[0] : rawId;
+  if (!targetUserId) {
+    return res.status(400).json({ error: 'User id is required.' });
+  }
+  if (targetUserId === req.authUserId) {
+    return res.status(400).json({ error: 'You cannot delete your own account from this screen.' });
+  }
+
+  const service = tryGetSupabaseAdmin();
+  if (!service) {
+    return res.status(503).json({
+      error: 'SUPABASE_SERVICE_ROLE_KEY is required on the server to delete users.',
+    });
+  }
+
+  try {
+    const result = await purgeUserAccount(service, targetUserId);
+    return res.json({
+      ok: true,
+      deletedUserId: targetUserId,
+      removedStorageObjects: result.removedPaths,
+    });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Failed to delete user.';
+    return res.status(500).json({ error: `Failed to delete user: ${message}` });
   }
 });

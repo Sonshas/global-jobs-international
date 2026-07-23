@@ -51,7 +51,7 @@ function getStripe(): Stripe {
 }
 
 function appUrl(): string {
-  return env.PUBLIC_APP_URL ?? env.CLIENT_ORIGIN;
+  return env.PUBLIC_APP_URL ?? env.CLIENT_ORIGIN.split(',')[0]!.trim();
 }
 
 async function markSessionPaid(session: Stripe.Checkout.Session) {

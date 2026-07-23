@@ -933,7 +933,10 @@
     "interviewAtLabel": "Interview date & time",
     "meetingUrlLabel": "Meeting URL (optional)",
     "campaignStartsAt": "Campaign start date & time",
-    "campaignEndsAt": "Campaign end date & time"
+    "campaignEndsAt": "Campaign end date & time",
+    "cannotDeleteSelf": "You cannot delete your own account from this screen.",
+    "deleteUserConfirm": "Permanently delete {{email}}? This removes their auth account and related records and cannot be undone.",
+    "deleteUserFailed": "Failed to delete user."
   },
   "footer": {
     "tagline": "Reclutamiento internacional premium que conecta a los solicitantes con empleadores verificados en todo el mundo: solicitudes, documentos, visas y viajes en un solo flujo de trabajo.",

@@ -24,7 +24,11 @@
     "typecheck": "npm run typecheck -w shared && npm run typecheck -w server && npm run typecheck -w client",
     "test:e2e": "playwright test",
     "test:e2e:staging": "cross-env E2E_SKIP_WEB_SERVER=1 playwright test",
-    "test:e2e:ui": "playwright test --ui"
+    "test:e2e:ui": "playwright test --ui",
+    "verify:production": "node scripts/verify-production-deploy.mjs",
+    "verify:production:local": "node scripts/verify-production-deploy.mjs --local-only",
+    "env:client:production": "node scripts/create-client-env-production.mjs",
+    "build:client:production": "node scripts/create-client-env-production.mjs && npm run build -w client && node scripts/verify-production-deploy.mjs --local-only"
   },
   "engines": {
     "node": ">=20.0.0"

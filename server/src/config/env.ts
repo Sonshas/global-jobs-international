@@ -19,12 +19,32 @@ function looksLikePlaceholder(value: string | undefined): boolean {
   );
 }
 
+/** Comma-separated origins, e.g. https://a.com,https://www.a.com */
+function parseOriginList(raw: string): string[] {
+  return raw
+    .split(',')
+    .map((part) => part.trim())
+    .filter(Boolean);
+}
+
+function isHttpOrigin(value: string): boolean {
+  try {
+    const parsed = new URL(value);
+    return (parsed.protocol === 'http:' || parsed.protocol === 'https:') && !parsed.pathname.replace(/\/$/, '');
+  } catch {
+    return false;
+  }
+}
+
 const envSchema = z
   .object({
     PORT: z.coerce.number().int().positive().default(3001),
+    /** Bind address. Production defaults to loopback (Nginx proxies). */
+    HOST: z.string().default(''),
     NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
     APP_ENV: z.enum(['development', 'staging', 'production']).default('development'),
-    CLIENT_ORIGIN: z.string().url().default('http://localhost:5173'),
+    /** One origin, or comma-separated list (apex + www). */
+    CLIENT_ORIGIN: z.string().default('http://localhost:5173'),
     SUPABASE_URL: z.preprocess((value) => (isBlank(value) ? undefined : value), z.string().url().optional()),
     SUPABASE_ANON_KEY: z.preprocess((value) => (isBlank(value) ? undefined : value), z.string().min(1).optional()),
     SUPABASE_SERVICE_ROLE_KEY: z.preprocess(
@@ -42,6 +62,34 @@ const envSchema = z
     const issues: Array<{ path: string; message: string }> = [];
     const stagingOrProduction =
       value.APP_ENV === 'staging' || value.APP_ENV === 'production' || value.NODE_ENV === 'production';
+
+    const origins = parseOriginList(value.CLIENT_ORIGIN);
+    if (origins.length === 0) {
+      issues.push({ path: 'CLIENT_ORIGIN', message: 'Required. Set the public SPA origin(s).' });
+    }
+    for (const origin of origins) {
+      if (!isHttpOrigin(origin)) {
+        issues.push({
+          path: 'CLIENT_ORIGIN',
+          message: `Invalid origin "${origin}". Use full origins like https://globaljobsinternational.com (comma-separated for www).`,
+        });
+      }
+    }
+    if (value.APP_ENV === 'production' || value.NODE_ENV === 'production') {
+      if (origins.some((origin) => /localhost|127\.0\.0\.1/i.test(origin))) {
+        issues.push({
+          path: 'CLIENT_ORIGIN',
+          message:
+            'Must not be localhost in production. Example: https://globaljobsinternational.com,https://www.globaljobsinternational.com',
+        });
+      }
+      if (origins.some((origin) => origin.startsWith('http://') && !/localhost|127\.0\.0\.1/i.test(origin))) {
+        issues.push({
+          path: 'CLIENT_ORIGIN',
+          message: 'Use https:// origins in production.',
+        });
+      }
+    }
 
     if (!value.SUPABASE_URL) {
       issues.push({
@@ -90,6 +138,12 @@ const envSchema = z
             message: 'Required in production for Stripe Checkout payments.',
           });
         }
+      }
+      if (value.PUBLIC_APP_URL && /localhost|127\.0\.0\.1|example\.com/i.test(value.PUBLIC_APP_URL)) {
+        issues.push({
+          path: 'PUBLIC_APP_URL',
+          message: 'Must be the real public HTTPS site URL in production.',
+        });
       }
       if (!value.RESEND_API_KEY) {
         issues.push({
@@ -150,7 +204,9 @@ export function loadServerEnv(envSource: NodeJS.ProcessEnv = process.env): Serve
     console.error('  • RESEND_API_KEY / EMAIL_FROM');
     console.error('      → https://resend.com (API keys + verified domain)');
     console.error('  • CLIENT_ORIGIN');
-    console.error('      → Exact browser origin of the SPA (e.g. http://localhost:5173)');
+    console.error(
+      '      → Public SPA origin(s), comma-separated if needed (https://globaljobsinternational.com,https://www.globaljobsinternational.com)',
+    );
     console.error('════════════════════════════════════════════════════════════');
     console.error('');
     process.exit(1);
@@ -160,6 +216,20 @@ export function loadServerEnv(envSource: NodeJS.ProcessEnv = process.env): Serve
 }
 
 export const env = loadServerEnv();
+
+export function clientOrigins(): string[] {
+  return parseOriginList(env.CLIENT_ORIGIN);
+}
+
+export function primaryClientOrigin(): string {
+  return clientOrigins()[0] ?? env.CLIENT_ORIGIN;
+}
+
+export function listenHost(): string {
+  if (env.HOST.trim()) return env.HOST.trim();
+  if (env.APP_ENV === 'production' || env.NODE_ENV === 'production') return '127.0.0.1';
+  return '0.0.0.0';
+}
 
 export function hasServiceRoleKey(): boolean {
   return Boolean(env.SUPABASE_SERVICE_ROLE_KEY) && !looksLikePlaceholder(env.SUPABASE_SERVICE_ROLE_KEY);

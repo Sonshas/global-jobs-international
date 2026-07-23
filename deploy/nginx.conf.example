@@ -1,18 +1,34 @@
-# Copy to /etc/nginx/sites-available/global-jobs-international, replace values,
-# then enable it with a symlink in sites-enabled and validate with `nginx -t`.
+# Copy to /etc/nginx/sites-available/global-jobs-international and enable:
+#   sudo ln -sf /etc/nginx/sites-available/global-jobs-international /etc/nginx/sites-enabled/
+#   sudo nginx -t && sudo systemctl reload nginx
 #
-# HTTPS: obtain the certificate first:
-#   sudo certbot --nginx -d example.com -d www.example.com
-# Certbot can add the 443 block and HTTP redirect automatically. Keep TLS
-# certificates and private keys outside the application directory and Git.
+# TLS (after DNS points here):
+#   sudo certbot --nginx -d globaljobsinternational.com -d www.globaljobsinternational.com
+#
+# CRITICAL — proxy_pass must NOT end with a slash:
+#   proxy_pass http://127.0.0.1:3001;   # keeps /api/health → Express /api/health
+#   proxy_pass http://127.0.0.1:3001/;  # WRONG: strips /api
+#
+# root must be the Vite build output: .../client/dist
 
+# Redirect apex/www HTTP → HTTPS (Certbot may manage this block).
 server {
     listen 80;
     listen [::]:80;
-    server_name example.com www.example.com;
+    server_name globaljobsinternational.com www.globaljobsinternational.com;
+    return 301 https://$host$request_uri;
+}
 
-    # After Certbot is configured, redirect all port 80 traffic to HTTPS:
-    # return 301 https://$host$request_uri;
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name globaljobsinternational.com www.globaljobsinternational.com;
+
+    # Certbot will replace these paths when you run `certbot --nginx`.
+    # ssl_certificate /etc/letsencrypt/live/globaljobsinternational.com/fullchain.pem;
+    # ssl_certificate_key /etc/letsencrypt/live/globaljobsinternational.com/privkey.pem;
+    # include /etc/letsencrypt/options-ssl-nginx.conf;
+    # ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
 
     root /var/www/global-jobs-international/client/dist;
     index index.html;
@@ -22,8 +38,7 @@ server {
     add_header X-Frame-Options "DENY" always;
     add_header Referrer-Policy "strict-origin-when-cross-origin" always;
     add_header Permissions-Policy "camera=(), microphone=(), geolocation=()" always;
-    # Enable this only in the final HTTPS server block:
-    # add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
 
     gzip on;
     gzip_vary on;
@@ -31,6 +46,11 @@ server {
     gzip_comp_level 5;
     gzip_min_length 1024;
     gzip_types text/plain text/css application/json application/javascript application/xml image/svg+xml;
+
+    # Exact /api and /api/* → Express on loopback (API binds 127.0.0.1 in production).
+    location = /api {
+        return 301 /api/;
+    }
 
     location /api/ {
         proxy_pass http://127.0.0.1:3001;
@@ -42,13 +62,21 @@ server {
         proxy_read_timeout 60s;
     }
 
-    location / {
-        try_files $uri $uri/ /index.html;
-    }
-
-    location ~* \.(?:js|css|woff2|png|jpg|jpeg|gif|svg|ico)$ {
+    location /assets/ {
         try_files $uri =404;
         expires 7d;
         add_header Cache-Control "public, max-age=604800, immutable";
+        access_log off;
+    }
+
+    location ~* \.(?:js|css|woff2|png|jpg|jpeg|gif|svg|ico|txt|xml|webp)$ {
+        try_files $uri =404;
+        expires 7d;
+        add_header Cache-Control "public, max-age=604800, immutable";
+        access_log off;
+    }
+
+    location / {
+        try_files $uri $uri/ /index.html;
     }
 }

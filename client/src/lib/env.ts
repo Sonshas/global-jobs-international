@@ -2,6 +2,16 @@
  * Client environment validation.
  * Staging/production builds fail closed when secrets are missing or placeholders.
  */
+function isValidApiBase(value: string): boolean {
+  if (value.startsWith('/') && !value.startsWith('//')) return true;
+  try {
+    const parsed = new URL(value);
+    return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+  } catch {
+    return false;
+  }
+}
+
 export function validateClientEnv() {
   const issues: string[] = [];
   const url = import.meta.env.VITE_SUPABASE_URL as string | undefined;
@@ -28,7 +38,9 @@ export function validateClientEnv() {
     issues.push('VITE_SUPABASE_ANON_KEY still looks like a placeholder');
   }
   if (privileged && !apiUrl) {
-    issues.push('VITE_API_URL (Express API base including /api)');
+    issues.push('VITE_API_URL (use /api for same-origin Nginx, or https://your-domain/api)');
+  } else if (apiUrl && !isValidApiBase(apiUrl)) {
+    issues.push('VITE_API_URL must be an absolute http(s) URL or a path like /api');
   }
 
   if (privileged && issues.length > 0) {

@@ -1,8 +1,7 @@
 /**
  * PM2 production process definition.
  * The API loads server/.env itself; keep that file mode 600 and never commit it.
- * PM2 does not load a dotenv file through this config, so do not put secrets in
- * `env` below. Use the host environment or /var/www/global-jobs-international/server/.env.
+ * Do not put secrets in `env` below.
  */
 module.exports = {
   apps: [
@@ -18,6 +17,9 @@ module.exports = {
       time: true,
       env: {
         NODE_ENV: 'production',
+        // API is proxied by Nginx; keep it on loopback only.
+        HOST: '127.0.0.1',
+        PORT: 3001,
       },
     },
   ],
