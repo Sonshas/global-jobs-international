@@ -1,45 +1,43 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { AuthLayout } from '@/components/auth/AuthLayout';
 import { AuthCard } from '@/components/auth/AuthCard';
 import { FormAlert } from '@/components/auth/FormFields';
 import { Button } from '@/components/ui/Button';
+import {
+  clearAuthParamsFromUrl,
+  completeAuthCallbackFromUrl,
+} from '@/lib/auth-callback';
 import { getAuthErrorMessage } from '@/lib/auth-errors';
-import { supabase } from '@/lib/supabase';
 
 export function AuthCallbackPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
+  const [needsLogin, setNeedsLogin] = useState(false);
 
   useEffect(() => {
     let active = true;
 
     const completeAuth = async () => {
       try {
-        const url = new URL(window.location.href);
-        const code = url.searchParams.get('code');
-        const errorDescription =
-          url.searchParams.get('error_description') || url.searchParams.get('error');
-
-        if (errorDescription) {
-          throw new Error(errorDescription);
-        }
-
-        if (code) {
-          const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
-          if (exchangeError) throw exchangeError;
-        } else {
-          const { data, error: sessionError } = await supabase.auth.getSession();
-          if (sessionError) throw sessionError;
-          if (!data.session) {
-            throw new Error(t('auth.sessionExpired'));
-          }
-        }
-
+        const outcome = await completeAuthCallbackFromUrl();
         if (!active) return;
-        navigate('/dashboard', { replace: true });
+
+        if (outcome.status === 'signed_in') {
+          clearAuthParamsFromUrl();
+          navigate(outcome.nextPath, { replace: true });
+          return;
+        }
+
+        if (outcome.status === 'confirmed_needs_login') {
+          clearAuthParamsFromUrl();
+          setNeedsLogin(true);
+          return;
+        }
+
+        setError(getAuthErrorMessage(new Error(outcome.message)));
       } catch (err) {
         if (!active) return;
         setError(getAuthErrorMessage(err));
@@ -51,17 +49,29 @@ export function AuthCallbackPage() {
     return () => {
       active = false;
     };
-  }, [navigate, t]);
+  }, [navigate]);
 
   return (
     <AuthLayout title={t('auth.callbackTitle')} subtitle={t('auth.callbackSubtitle')}>
       <AuthCard>
-        {error ? (
+        {needsLogin ? (
+          <div className="space-y-4">
+            <FormAlert variant="success">{t('auth.emailConfirmedSignIn')}</FormAlert>
+            <Button href="/login" className="w-full rounded-2xl">
+              {t('auth.goToSignIn')}
+            </Button>
+          </div>
+        ) : error ? (
           <div className="space-y-4">
             <FormAlert>{error}</FormAlert>
             <Button href="/login" className="w-full rounded-2xl">
               {t('auth.goToSignIn')}
             </Button>
+            <p className="text-center text-sm text-ink-muted dark:text-ink-muted-dark">
+              <Link to="/verify-email" className="underline underline-offset-2">
+                {t('auth.resendVerification')}
+              </Link>
+            </p>
           </div>
         ) : (
           <p className="text-center text-sm text-ink-muted dark:text-ink-muted-dark">

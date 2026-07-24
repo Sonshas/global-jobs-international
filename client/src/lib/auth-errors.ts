@@ -34,6 +34,9 @@ export function getAuthErrorMessage(error: unknown): string {
   if (normalized.includes('placeholder') || normalized.includes('invalid api key')) {
     return 'Supabase is not configured. Add your project URL and anon key to client/.env.';
   }
+  if (normalized.includes('pkce') || normalized.includes('code verifier')) {
+    return 'Email confirmed. Please sign in on this device to continue.';
+  }
 
   return message;
 }

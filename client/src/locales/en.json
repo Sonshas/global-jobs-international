@@ -366,6 +366,7 @@
     "callbackSubtitle": "Please wait while we securely finish signing you in.",
     "completingVerification": "Completing verification…",
     "goToSignIn": "Go to sign in",
+    "emailConfirmedSignIn": "Your email is confirmed. Sign in with your email and password to continue.",
     "sessionExpired": "No authentication session found. The link may have expired.",
     "registerAsEmployer": "Register as an employer",
     "registerAsApplicant": "Register as a job seeker instead",

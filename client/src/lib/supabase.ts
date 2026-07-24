@@ -38,13 +38,44 @@ export const supabase: SupabaseClient = createClient(resolvedUrl, resolvedKey, {
   auth: {
     autoRefreshToken: true,
     persistSession: true,
+    // Implicit flow puts session tokens in the email-link hash so confirmation
+    // works on any browser/device (PKCE would require a stored code verifier).
     detectSessionInUrl: true,
-    flowType: 'pkce',
+    flowType: 'implicit',
   },
 });
 
+const PRODUCTION_SITE_FALLBACK = 'https://globaljobsinternational.com';
+
+function isLocalOrigin(origin: string): boolean {
+  return /localhost|127\.0\.0\.1/i.test(origin);
+}
+
+/**
+ * Canonical origin for Supabase auth email links (signup confirm, password reset).
+ * Production/staging builds always use VITE_PUBLIC_SITE_URL (never window localhost).
+ * Development uses the current origin so local Supabase redirect allow-lists keep working.
+ */
+export function getPublicSiteOrigin(): string {
+  const configured = (import.meta.env.VITE_PUBLIC_SITE_URL as string | undefined)?.trim().replace(/\/$/, '');
+  const appEnv = (import.meta.env.VITE_APP_ENV as string | undefined)?.toLowerCase();
+  const privileged =
+    import.meta.env.PROD || appEnv === 'production' || appEnv === 'staging';
+
+  if (privileged) {
+    if (configured && !isLocalOrigin(configured)) return configured;
+    return PRODUCTION_SITE_FALLBACK;
+  }
+
+  if (configured && !isLocalOrigin(configured)) return configured;
+  if (typeof window !== 'undefined' && window.location?.origin) {
+    return window.location.origin.replace(/\/$/, '');
+  }
+  return PRODUCTION_SITE_FALLBACK;
+}
+
 export function getAuthRedirectUrl(path: string): string {
-  const base = window.location.origin;
+  const base = getPublicSiteOrigin();
   const normalized = path.startsWith('/') ? path : `/${path}`;
   return `${base}${normalized}`;
 }

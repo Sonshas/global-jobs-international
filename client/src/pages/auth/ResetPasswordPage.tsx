@@ -8,6 +8,10 @@ import { AuthCard } from '@/components/auth/AuthCard';
 import { Field, FormAlert, TextInput } from '@/components/auth/FormFields';
 import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/hooks/useAuth';
+import {
+  clearAuthParamsFromUrl,
+  completeAuthCallbackFromUrl,
+} from '@/lib/auth-callback';
 import { createResetPasswordSchema, type ResetPasswordFormValues } from '@/schemas/auth';
 import { supabase } from '@/lib/supabase';
 
@@ -25,15 +29,30 @@ export function ResetPasswordPage() {
     let mounted = true;
 
     const prepare = async () => {
-      const { data } = await supabase.auth.getSession();
+      const outcome = await completeAuthCallbackFromUrl();
       if (!mounted) return;
 
-      if (data.session || isAuthenticated) {
+      if (outcome.status === 'signed_in') {
+        clearAuthParamsFromUrl();
+        setLinkError(null);
         setReady(true);
         return;
       }
 
-      setLinkError(t('auth.resetLinkInvalid'));
+      const { data } = await supabase.auth.getSession();
+      if (!mounted) return;
+
+      if (data.session || isAuthenticated) {
+        setLinkError(null);
+        setReady(true);
+        return;
+      }
+
+      setLinkError(
+        outcome.status === 'confirmed_needs_login'
+          ? t('auth.emailConfirmedSignIn')
+          : t('auth.resetLinkInvalid'),
+      );
       setReady(true);
     };
 
